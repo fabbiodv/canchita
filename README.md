@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Canchita - Sistema de Reserva de Canchas
 
-## Getting Started
+## Descripción
+Sistema web para la reserva de canchas deportivas desarrollado con Next.js 14, React 19, TypeScript y Tailwind CSS.
 
-First, run the development server:
+## Características
+- 🏟️ Reserva de diferentes tipos de canchas (Fútbol 5, 7 y 11)
+- 📅 Calendario interactivo para selección de fechas
+- ⏰ Sistema de horarios disponibles
+- 💳 Integración con MercadoPago para pagos
+- 🎨 Interfaz moderna y responsive
+
+## Requisitos Previos
+- Node.js 18.0 o superior
+- npm, yarn, pnpm o bun
+
+## Instalación
+
+1. Clona el repositorio:
 
 ```bash
+git clone https://github.com/tu-usuario/canchita.git
+cd canchita
+```
+
+2. Instala las dependencias:
+```bash
+npm install
+# o
+yarn install
+# o
+pnpm install
+# o
+bun install
+```
+
+3. Inicia el servidor de desarrollo:
+```bash
 npm run dev
-# or
+# o
 yarn dev
-# or
+# o
 pnpm dev
-# or
+# o
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tecnologías Utilizadas
+- [Next.js 14](https://nextjs.org/)
+- [React 19](https://react.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Shadcn/ui](https://ui.shadcn.com/)
+- [Radix UI](https://www.radix-ui.com/)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Estructura del Proyecto
+```
+canchita/
+├── src/
+│   ├── app/           # Rutas y páginas
+│   ├── components/    # Componentes React
+│   ├── lib/          # Utilidades y configuraciones
+│   └── types/        # Definiciones de TypeScript
+├── public/           # Archivos estáticos
+└── ...
+```
 
-## Learn More
+## Despliegue
+La forma más sencilla de desplegar esta aplicación es usando [Vercel](https://vercel.com):
 
-To learn more about Next.js, take a look at the following resources:
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/tu-usuario/canchita)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Licencia
+MIT
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Contribuir
+Las contribuciones son bienvenidas. Por favor, abre un issue o pull request para sugerencias.
