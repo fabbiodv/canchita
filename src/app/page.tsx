@@ -1,17 +1,16 @@
 'use client'
 
-import { Calendar } from "@/components/ui/calendar";
+import { Calendar } from "@/components/ui/calendar"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { useState } from "react";
-import { es } from "date-fns/locale";
+} from "@/components/ui/select"
+import { useState } from "react"
+import { es } from "date-fns/locale"
+import ResumenReserva from "@/components/resumen-reserva"
 
 export default function Home() {
 
@@ -21,7 +20,7 @@ export default function Home() {
     <div className='min-h-screen'>
 
       <header className='py-8 text-center'>
-        <h1 className='text-4xl font-bold text-green-800'>Reservar Cancha</h1>
+        <h1 className='text-4xl font-bold'>Reservar Cancha</h1>
       </header>
 
       <main className='container mx-auto px-4 max-w-4xl'>
@@ -86,39 +85,16 @@ export default function Home() {
           </div>
 
           {/* Resumen de Reserva */}
-          <Card className='p-6 space-y-4 h-fit'>
-            <h2 className="text-xl font-semibold text-gray-800">
-              Resumen de Reserva
-            </h2>
-            <div className="space-y-2 text-sm">
-              <p className="flex justify-between">
-                <span className="text-gray-600">Cancha:</span>
-                <span className="font-medium">Cancha 1 - Fútbol 5</span>
-              </p>
-              <p className="flex justify-between">
-                <span className="text-gray-600">Fecha:</span>
-                <span className="font-medium">15 de Marzo, 2024</span>
-              </p>
-              <p className="flex justify-between">
-                <span className="text-gray-600">Hora:</span>
-                <span className="font-medium">19:00 - 20:00</span>
-              </p>
-              <div className="border-t pt-2 mt-2">
-                <p className="flex justify-between text-lg font-semibold">
-                  <span>Total:</span>
-                  <span>$200</span>
-                </p>
-              </div>
-            </div>
-
-            <Button
-              className="w-full bg-[#009ee3] hover:bg-[#008ed0] text-white"
-              size="lg"
-            >
-
-              Reservar y Pagar
-            </Button>
-          </Card>
+          <ResumenReserva
+            cancha="Cancha 1 - Fútbol 5"
+            fecha="15 de Marzo, 2024"
+            hora="19:00 - 20:00"
+            total={200}
+            onReservar={() => {
+              // Aquí irá la lógica de reserva
+              console.log('Reservando...')
+            }}
+          />
         </div>
       </main>
     </div>
