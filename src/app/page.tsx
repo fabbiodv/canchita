@@ -12,10 +12,22 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import { es } from "date-fns/locale";
-
+import { format } from 'date-fns'
+import ResumenReserva from '@/components/resumen-reserva'
+  
 export default function Home() {
 
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
+  const [selectedCourt, setSelectedCourt] = useState<string>("")
+  const [selectedTime, setSelectedTime] = useState<string>("")
+
+  const handleCourtSelect = (value: string) => {
+    setSelectedCourt(value)
+  }
+
+  const handleTimeSelect = (value: string) => {
+    setSelectedTime(value)
+  }
 
   return (
     <div className='min-h-screen'>
@@ -33,7 +45,7 @@ export default function Home() {
               <label className="text-sm font-medium text-gray-700">
                 Seleccionar Cancha
               </label>
-              <Select>
+              <Select onValueChange={handleCourtSelect} value={selectedCourt}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Elige una cancha" />
                 </SelectTrigger>
@@ -71,54 +83,30 @@ export default function Home() {
               <label className='text-sm font-medium text-gray-700'>
                 Seleccionar Horario
               </label>
-              <Select>
+              <Select onValueChange={handleTimeSelect} value={selectedTime}>
                 <SelectTrigger className='w-full'>
                   <SelectValue placeholder='Elige un horario' />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="18">18:00 - 19:00</SelectItem>
-                  <SelectItem value='19'>19:00 - 20:00</SelectItem>
-                  <SelectItem value='20'>20:00 - 21:00</SelectItem>
-                  <SelectItem value='21'>21:00 - 22:00</SelectItem>
+                  <SelectItem value="19">19:00 - 20:00</SelectItem>
+                  <SelectItem value="20">20:00 - 21:00</SelectItem>
+                  <SelectItem value="21">21:00 - 22:00</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           {/* Resumen de Reserva */}
-          <Card className='p-6 space-y-4 h-fit'>
-            <h2 className="text-xl font-semibold text-gray-800">
-              Resumen de Reserva
-            </h2>
-            <div className="space-y-2 text-sm">
-              <p className="flex justify-between">
-                <span className="text-gray-600">Cancha:</span>
-                <span className="font-medium">Cancha 1 - Fútbol 5</span>
-              </p>
-              <p className="flex justify-between">
-                <span className="text-gray-600">Fecha:</span>
-                <span className="font-medium">15 de Marzo, 2024</span>
-              </p>
-              <p className="flex justify-between">
-                <span className="text-gray-600">Hora:</span>
-                <span className="font-medium">19:00 - 20:00</span>
-              </p>
-              <div className="border-t pt-2 mt-2">
-                <p className="flex justify-between text-lg font-semibold">
-                  <span>Total:</span>
-                  <span>$200</span>
-                </p>
-              </div>
-            </div>
-
-            <Button
-              className="w-full bg-[#009ee3] hover:bg-[#008ed0] text-white"
-              size="lg"
-            >
-
-              Reservar y Pagar
-            </Button>
-          </Card>
+          <ResumenReserva 
+            cancha={selectedCourt ? {
+              cancha1: "Cancha 1 - Fútbol 5",
+              cancha2: "Cancha 2 - Fútbol 7",
+              cancha3: "Cancha 3 - Fútbol 11"
+            }[selectedCourt] : undefined}
+            fecha={selectedDate ? format(selectedDate, 'dd/MM/yyyy', { locale: es }) : undefined}
+            hora={selectedTime ? `${selectedTime}:00 - ${Number(selectedTime) + 1}:00` : undefined}
+          />
         </div>
       </main>
     </div>
