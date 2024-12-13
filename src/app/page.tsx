@@ -1,6 +1,6 @@
 'use client'
 
-import { Calendar } from "@/components/ui/calendar";
+import { Calendar } from "@/components/ui/calendar"
 import {
   Select,
   SelectContent,
@@ -33,7 +33,7 @@ export default function Home() {
     <div className='min-h-screen'>
 
       <header className='py-8 text-center'>
-        <h1 className='text-4xl font-bold text-green-800'>Reservar Cancha</h1>
+        <h1 className='text-4xl font-bold'>Reservar Cancha</h1>
       </header>
 
       <main className='container mx-auto px-4 max-w-4xl'>
