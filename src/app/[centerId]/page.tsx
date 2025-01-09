@@ -113,59 +113,63 @@ export default function ReservePage({ params }: PageProps) {
                         </div>
 
                         {/* Selector de Cancha */}
-                        {selectedDate && (
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">
-                                    Seleccionar Cancha
-                                </label>
-                                <Select onValueChange={setSelectedField} value={selectedField}>
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Elige una cancha" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {Array.isArray(fields) && fields.length > 0 ? (
-                                            fields.map((field) => (
-                                                <SelectItem
-                                                    key={field.id}
-                                                    value={field.id.toString()}
-                                                >
-                                                    {field.name} - {field.type} (${field.price})
-                                                </SelectItem>
-                                            ))
-                                        ) : (
-                                            <SelectItem value="no-fields" disabled>
-                                                No hay canchas disponibles
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">
+                                Seleccionar Cancha
+                            </label>
+                            <Select
+                                onValueChange={setSelectedField}
+                                value={selectedField}
+                                disabled={!selectedDate}
+                            >
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Elige una cancha" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {Array.isArray(fields) && fields.length > 0 ? (
+                                        fields.map((field) => (
+                                            <SelectItem
+                                                key={field.id}
+                                                value={field.id.toString()}
+                                            >
+                                                {field.name} - {field.type} (${field.price})
                                             </SelectItem>
-                                        )}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        )}
+                                        ))
+                                    ) : (
+                                        <SelectItem value="no-fields" disabled>
+                                            No hay canchas disponibles
+                                        </SelectItem>
+                                    )}
+                                </SelectContent>
+                            </Select>
+                        </div>
 
                         {/* Selector de Hora */}
-                        {selectedField && (
-                            <div className='space-y-2'>
-                                <label className='text-sm font-medium text-gray-700'>
-                                    Seleccionar Horario
-                                </label>
-                                <Select onValueChange={setSelectedTime} value={selectedTime}>
-                                    <SelectTrigger className='w-full'>
-                                        <SelectValue placeholder='Elige un horario' />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {availableTimeSlots.map((slot) => (
-                                            <SelectItem
-                                                key={slot.startTime}
-                                                value={slot.startTime}
-                                                disabled={!slot.isAvailable}
-                                            >
-                                                {slot.startTime} - {slot.endTime}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        )}
+                        <div className='space-y-2'>
+                            <label className='text-sm font-medium text-gray-700'>
+                                Seleccionar Horario
+                            </label>
+                            <Select
+                                onValueChange={setSelectedTime}
+                                value={selectedTime}
+                                disabled={!selectedField}
+                            >
+                                <SelectTrigger className='w-full'>
+                                    <SelectValue placeholder='Elige un horario' />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {availableTimeSlots.map((slot) => (
+                                        <SelectItem
+                                            key={slot.startTime}
+                                            value={slot.startTime}
+                                            disabled={!slot.isAvailable}
+                                        >
+                                            {slot.startTime} - {slot.endTime}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
 
                     {/* Resumen de Reserva */}
