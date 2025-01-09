@@ -1,112 +1,112 @@
 'use client'
 
-import { Calendar } from "@/components/ui/calendar"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useState } from "react";
-import { es } from "date-fns/locale";
-import { format } from 'date-fns'
-import ResumenReserva from '@/components/resumen-reserva'
-  
+import Image from 'next/image'
+import Link from 'next/link'
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+
 export default function Home() {
-
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
-  const [selectedCourt, setSelectedCourt] = useState<string>("")
-  const [selectedTime, setSelectedTime] = useState<string>("")
-
-  const handleCourtSelect = (value: string) => {
-    setSelectedCourt(value)
-  }
-
-  const handleTimeSelect = (value: string) => {
-    setSelectedTime(value)
-  }
-
   return (
     <div className='min-h-screen'>
+      <main className='container mx-auto px-4 max-w-6xl'>
+        {/* Hero Section */}
+        <section className='py-20 text-center'>
+          <h1 className='text-6xl font-bold mb-6'>
+            Reserva tu cancha de fútbol
+            <span className='text-[#009ee3] block mt-2'>en segundos</span>
+          </h1>
+          <p className='text-xl text-gray-600 mb-8 max-w-2xl mx-auto'>
+            Sistema simple y rápido para reservar canchas deportivas. Sin complicaciones, sin llamadas, todo online.
+          </p>
+          <Button
+            className='bg-[#009ee3] hover:bg-[#008ed0] text-white px-8 py-6 text-lg'
+            asChild
+          >
+            <Link href="/centers">Reservar Ahora</Link>
+          </Button>
+        </section>
 
-      <header className='py-8 text-center'>
-        <h1 className='text-4xl font-bold'>Reservar Cancha</h1>
-      </header>
-
-      <main className='container mx-auto px-4 max-w-4xl'>
-        <div className='grid gap-8 md:grid-cols-[1fr_300px]'>
-          {/* Formulario Principal */}
-          <div className='space-y-6'>
-            {/* Selector de Cancha */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">
-                Seleccionar Cancha
-              </label>
-              <Select onValueChange={handleCourtSelect} value={selectedCourt}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Elige una cancha" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="cancha1">Cancha 1 - Fútbol 5</SelectItem>
-                  <SelectItem value="cancha2">Cancha 2 - Fútbol 7</SelectItem>
-                  <SelectItem value="cancha3">Cancha 3 - Fútbol 11</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Calendario */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">
-                Seleccionar Fecha
-              </label>
-              <Calendar
-                mode="single"
-                locale={es}
-                selected={selectedDate}
-                onSelect={setSelectedDate}
-                className="w-full rounded-lg border shadow p-3"
-                classNames={{
-                  months: 'w-full flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0',
-                  month: 'w-full',
-                  table: 'w-full',
-                  head_row: 'w-full',
-                  row: 'w-full',
-                }}
+        {/* Características */}
+        <section className='py-16 grid md:grid-cols-3 gap-8'>
+          <Card className='p-6 text-center'>
+            <div className='mb-4'>
+              <Image
+                src="/window.svg"
+                alt="Reserva Online"
+                width={48}
+                height={48}
+                className='mx-auto'
               />
             </div>
+            <h3 className='text-xl font-semibold mb-2'>Reserva Online</h3>
+            <p className='text-gray-600'>Reserva tu cancha en cualquier momento, desde cualquier dispositivo</p>
+          </Card>
 
-            {/* Selector de Hora */}
-            <div className='space-y-2'>
-              <label className='text-sm font-medium text-gray-700'>
-                Seleccionar Horario
-              </label>
-              <Select onValueChange={handleTimeSelect} value={selectedTime}>
-                <SelectTrigger className='w-full'>
-                  <SelectValue placeholder='Elige un horario' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="18">18:00 - 19:00</SelectItem>
-                  <SelectItem value="19">19:00 - 20:00</SelectItem>
-                  <SelectItem value="20">20:00 - 21:00</SelectItem>
-                  <SelectItem value="21">21:00 - 22:00</SelectItem>
-                </SelectContent>
-              </Select>
+          <Card className='p-6 text-center'>
+            <div className='mb-4'>
+              <Image
+                src="/mercadopago-logo.svg"
+                alt="Pago Seguro"
+                width={48}
+                height={48}
+                className='mx-auto bg-blue-500 rounded-full'
+              />
             </div>
-          </div>
+            <h3 className='text-xl font-semibold mb-2'>Pago Seguro</h3>
+            <p className='text-gray-600'>Paga de forma segura con MercadoPago</p>
+          </Card>
 
-          {/* Resumen de Reserva */}
-          <ResumenReserva 
-            cancha={selectedCourt ? {
-              cancha1: "Cancha 1 - Fútbol 5",
-              cancha2: "Cancha 2 - Fútbol 7",
-              cancha3: "Cancha 3 - Fútbol 11"
-            }[selectedCourt] : undefined}
-            fecha={selectedDate ? format(selectedDate, 'dd/MM/yyyy', { locale: es }) : undefined}
-            hora={selectedTime ? `${selectedTime}:00 - ${Number(selectedTime) + 1}:00` : undefined}
-          />
-        </div>
+          <Card className='p-6 text-center'>
+            <div className='mb-4'>
+              <Image
+                src="/window.svg"
+                alt="Gestión Simple"
+                width={48}
+                height={48}
+                className='mx-auto'
+              />
+            </div>
+            <h3 className='text-xl font-semibold mb-2'>Gestión Simple</h3>
+            <p className='text-gray-600'>Administra tus reservas fácilmente desde tu perfil</p>
+          </Card>
+        </section>
+
+        {/* Tipos de Canchas */}
+        <section className='py-16'>
+          <h2 className='text-4xl font-bold text-center mb-12'>Tipos de Canchas</h2>
+          <div className='grid md:grid-cols-3 gap-8'>
+            <Card className='p-6'>
+              <h3 className='text-xl font-semibold mb-4'>Fútbol 5</h3>
+              <ul className='space-y-2 text-gray-600'>
+                <li>• Césped sintético profesional</li>
+                <li>• Medidas reglamentarias</li>
+                <li>• Iluminación LED</li>
+                <li>• Ideal para partidos rápidos</li>
+              </ul>
+            </Card>
+
+            <Card className='p-6'>
+              <h3 className='text-xl font-semibold mb-4'>Fútbol 7</h3>
+              <ul className='space-y-2 text-gray-600'>
+                <li>• Mayor espacio de juego</li>
+                <li>• Césped de última generación</li>
+                <li>• Arcos reglamentarios</li>
+                <li>• Perfecta para equipos medianos</li>
+              </ul>
+            </Card>
+
+            <Card className='p-6'>
+              <h3 className='text-xl font-semibold mb-4'>Fútbol 11</h3>
+              <ul className='space-y-2 text-gray-600'>
+                <li>• Cancha profesional</li>
+                <li>• Césped natural o sintético</li>
+                <li>• Dimensiones oficiales</li>
+                <li>• Ideal para torneos</li>
+              </ul>
+            </Card>
+          </div>
+        </section>
       </main>
     </div>
-  );
+  )
 }
