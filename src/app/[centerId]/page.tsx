@@ -13,6 +13,7 @@ import {
 import { es } from "date-fns/locale"
 import { format } from 'date-fns'
 import ResumenReserva from '@/components/resumen-reserva'
+import { startOfDay } from 'date-fns'
 
 interface Field {
     id: number
@@ -78,6 +79,12 @@ export default function ReservePage({ params }: PageProps) {
         }
     }, [selectedField, fields])
 
+    const isDateDisabled = (date: Date) => {
+        const startOfToday = startOfDay(new Date())
+        return date < startOfToday
+    }
+
+
     return (
         <div className='min-h-screen'>
             <main className='container mx-auto px-4 max-w-4xl'>
@@ -101,7 +108,7 @@ export default function ReservePage({ params }: PageProps) {
                                     head_row: 'w-full',
                                     row: 'w-full',
                                 }}
-                                disabled={(date) => date < new Date()}
+                                disabled={isDateDisabled}
                             />
                         </div>
 
