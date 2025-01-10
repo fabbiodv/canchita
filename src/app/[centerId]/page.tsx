@@ -174,6 +174,7 @@ export default function ReservePage({ params }: PageProps) {
 
                     {/* Resumen de Reserva */}
                     <ResumenReserva
+                        fieldId={selectedField ? fields.find(f => f.id.toString() === selectedField)?.id : undefined}
                         cancha={selectedField ? fields.find(f => f.id.toString() === selectedField)?.name : undefined}
                         fecha={selectedDate ? format(selectedDate, 'dd/MM/yyyy', { locale: es }) : undefined}
                         hora={selectedTime ? availableTimeSlots.find(slot => slot.startTime === selectedTime)?.startTime : undefined}

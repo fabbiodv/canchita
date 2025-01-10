@@ -12,21 +12,47 @@ interface ResumenReservaProps {
   fecha?: string
   hora?: string
   precio?: number
+  fieldId?: number
 }
 
 const ResumenReserva = ({
   cancha = 'Sin seleccionar',
   fecha = 'Sin seleccionar',
   hora = 'Sin seleccionar',
-  precio = 2000
+  precio = 2000,
+  fieldId = 0
 }: ResumenReservaProps) => {
   const ADELANTO = 2000;
   const [isPagoTotal, setIsPagoTotal] = useState(false);
 
   const montoAPagar = isPagoTotal ? precio : ADELANTO;
 
-  const handleReservar = () => {
-    toast.success(`Reserva procesada correctamente - Pago ${isPagoTotal ? 'total' : 'adelanto'}`)
+  const handleReservar = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND_URL}/payments/create-preference`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          fieldId: fieldId,
+          date: fecha,
+          startTime: hora,
+          userId: 1,
+          isPagoTotal: isPagoTotal
+        })
+      })
+      const data = await response.json()
+
+      if (data.init_point) {
+        window.location.href = data.init_point;
+      } else {
+        toast.error('Error al procesar el pago');
+      }
+    } catch (error) {
+      console.error('Error al procesar la reserva:', error)
+      toast.error('Error al procesar la reserva');
+    }
   }
 
   return (
