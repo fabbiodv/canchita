@@ -5,6 +5,7 @@ interface User {
     email: string
     name?: string
     lastName?: string
+    mpAccessToken?: string
 }
 
 export function useAuth() {
