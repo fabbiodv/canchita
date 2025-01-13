@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 
 interface ResumenReservaProps {
+  address?: string
   cancha?: string
   fecha?: string
   hora?: string
@@ -16,6 +17,7 @@ interface ResumenReservaProps {
 }
 
 const ResumenReserva = ({
+  address,
   cancha = 'Sin seleccionar',
   fecha = 'Sin seleccionar',
   hora = 'Sin seleccionar',
@@ -56,11 +58,15 @@ const ResumenReserva = ({
   }
 
   return (
-    <Card className='p-6 space-y-4 h-fit'>
+    <Card className='p-6 space-y-4 h-fit mt-8'>
       <h2 className="text-xl font-semibold text-gray-800">
         Resumen de Reserva
       </h2>
       <div className="space-y-2 text-sm">
+        <p className="flex justify-between">
+          <span className="text-gray-600">Dirección:</span>
+          <span className="font-medium">{address}</span>
+        </p>
         <p className="flex justify-between">
           <span className="text-gray-600">Cancha:</span>
           <span className="font-medium">{cancha}</span>

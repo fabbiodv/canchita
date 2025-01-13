@@ -28,7 +28,7 @@ export default function Header() {
     return (
         <header className='py-6 px-8 flex justify-between items-center'>
             <Link href="/" className='text-3xl font-bold'>
-                Canchita App
+                Canchita
             </Link>
 
             <div className="flex items-center gap-4">
@@ -47,7 +47,7 @@ export default function Header() {
                 ) : (
                     <Button variant="outline" asChild>
                         <Link href="/login">
-                            Iniciar Sesión
+                            Ingresar
                         </Link>
                     </Button>
                 )}

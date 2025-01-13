@@ -2,18 +2,22 @@
 
 import { use } from "react"
 import { useEffect, useState } from "react"
-import { Calendar } from "@/components/ui/calendar"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
+
 import { es } from "date-fns/locale"
 import { format } from 'date-fns'
-import ResumenReserva from '@/components/resumen-reserva'
+import ResumenReserva from '@/components/reserva/resumen-reserva'
 import { startOfDay } from 'date-fns'
+import { ReservaCalendario } from '@/components/reserva/reserva-calendario'
+import { SelectorCancha } from '@/components/reserva/selector-cancha'
+import { SelectorHorario } from '@/components/reserva/select-horario'
+
+interface Center {
+    id: number
+    name: string
+    address: string
+    phone: string
+    email: string
+}
 
 interface Field {
     id: number
@@ -21,6 +25,7 @@ interface Field {
     type: string
     surface: string
     price: number
+    centerName: string
     availability?: TimeSlot[]
 }
 
@@ -37,6 +42,7 @@ interface PageProps {
 export default function ReservePage({ params }: PageProps) {
     const { centerId } = use(params)
     const [fields, setFields] = useState<Field[]>([])
+    const [center, setCenter] = useState<Center>()
     const [selectedField, setSelectedField] = useState<string>("")
     const [selectedDate, setSelectedDate] = useState<Date>()
     const [selectedTime, setSelectedTime] = useState<string>("")
@@ -53,8 +59,8 @@ export default function ReservePage({ params }: PageProps) {
                 )
                 const data = await response.json()
 
-                // Asegurarnos de que data sea un array
-                if (Array.isArray(data)) {
+                if (Array.isArray(data) && data.length > 0) {
+                    console.log('DATA: ', data)
                     setFields(data)
                 } else {
                     console.error('La respuesta no es un array:', data)
@@ -84,100 +90,53 @@ export default function ReservePage({ params }: PageProps) {
         return date < startOfToday
     }
 
+    // Cargar detalles del centro
+    useEffect(() => {
+        async function fetchCenterDetails() {
+            try {
+                const response = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_BACKEND_URL}/centers/${centerId}`
+                )
+                const data = await response.json()
+                setCenter(data)
+            } catch (error) {
+                console.error('Error al cargar detalles del centro:', error)
+            }
+        }
+
+        fetchCenterDetails()
+    }, [centerId])
 
     return (
         <div className='min-h-screen'>
             <main className='container mx-auto px-4 max-w-4xl'>
+                <h1 className='text-2xl font-bold mb-6 text-center'>{center?.name}</h1>
                 <div className='grid gap-8 md:grid-cols-[1fr_300px]'>
                     <div className='space-y-6'>
-                        {/* Calendario primero */}
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">
-                                Seleccionar Fecha
-                            </label>
-                            <Calendar
-                                mode="single"
-                                locale={es}
-                                selected={selectedDate}
-                                onSelect={setSelectedDate}
-                                className="w-full rounded-lg border shadow p-3"
-                                classNames={{
-                                    months: 'w-full flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0',
-                                    month: 'w-full',
-                                    table: 'w-full',
-                                    head_row: 'w-full',
-                                    row: 'w-full',
-                                }}
-                                disabled={isDateDisabled}
-                            />
-                        </div>
-
-                        {/* Selector de Cancha */}
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700">
-                                Seleccionar Cancha
-                            </label>
-                            <Select
-                                onValueChange={setSelectedField}
-                                value={selectedField}
-                                disabled={!selectedDate}
-                            >
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Elige una cancha" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {Array.isArray(fields) && fields.length > 0 ? (
-                                        fields.map((field) => (
-                                            <SelectItem
-                                                key={field.id}
-                                                value={field.id.toString()}
-                                            >
-                                                {field.name} - {field.type} (${field.price})
-                                            </SelectItem>
-                                        ))
-                                    ) : (
-                                        <SelectItem value="no-fields" disabled>
-                                            No hay canchas disponibles
-                                        </SelectItem>
-                                    )}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        {/* Selector de Hora */}
-                        <div className='space-y-2'>
-                            <label className='text-sm font-medium text-gray-700'>
-                                Seleccionar Horario
-                            </label>
-                            <Select
-                                onValueChange={setSelectedTime}
-                                value={selectedTime}
-                                disabled={!selectedField}
-                            >
-                                <SelectTrigger className='w-full'>
-                                    <SelectValue placeholder='Elige un horario' />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {availableTimeSlots.map((slot) => (
-                                        <SelectItem
-                                            key={slot.startTime}
-                                            value={slot.startTime}
-                                            disabled={!slot.isAvailable}
-                                        >
-                                            {slot.startTime} - {slot.endTime}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+                        <ReservaCalendario
+                            selectedDate={selectedDate}
+                            onSelectDate={setSelectedDate}
+                            isDateDisabled={isDateDisabled}
+                        />
+                        <SelectorCancha
+                            fields={fields}
+                            selectedField={selectedField}
+                            onFieldSelect={setSelectedField}
+                            disabled={!selectedDate}
+                        />
+                        <SelectorHorario
+                            timeSlots={availableTimeSlots}
+                            selectedTime={selectedTime}
+                            onTimeSelect={setSelectedTime}
+                            disabled={!selectedField}
+                        />
                     </div>
-
-                    {/* Resumen de Reserva */}
                     <ResumenReserva
+                        address={center?.address}
                         fieldId={selectedField ? fields.find(f => f.id.toString() === selectedField)?.id : undefined}
                         cancha={selectedField ? fields.find(f => f.id.toString() === selectedField)?.name : undefined}
                         fecha={selectedDate ? format(selectedDate, 'dd/MM/yyyy', { locale: es }) : undefined}
-                        hora={selectedTime ? availableTimeSlots.find(slot => slot.startTime === selectedTime)?.startTime : undefined}
+                        hora={selectedTime}
                         precio={selectedField ? fields.find(f => f.id.toString() === selectedField)?.price : undefined}
                     />
                 </div>
