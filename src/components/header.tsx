@@ -26,7 +26,7 @@ export default function Header() {
     }
 
     return (
-        <header className='py-6 px-8 flex justify-between items-center'>
+        <header className='py-6 px-8 flex justify-between items-center border-b border-gray-200'>
             <Link href="/" className='text-3xl font-bold'>
                 Canchita
             </Link>

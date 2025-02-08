@@ -3,11 +3,11 @@
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/useAuth"
 import { toast } from "sonner"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function ConnectMercadoPago() {
     const { user } = useAuth()
-
-
+    console.log(user)
     const handleConnect = async () => {
         try {
             const response = await fetch(
@@ -21,9 +21,8 @@ export default function ConnectMercadoPago() {
                 }
             )
 
-            console.log(response)
-
             const data = await response.json()
+            console.log(data)
 
             if (!data.authUrl) {
                 throw new Error("URL de autorización no recibida");
@@ -37,23 +36,29 @@ export default function ConnectMercadoPago() {
     }
 
     return (
-        <div className="space-y-4 container mx-auto">
-            <h2 className="text-xl font-semibold">Conectar MercadoPago</h2>
-            <p className="text-sm text-gray-600">
-                Conecta tu cuenta de MercadoPago para recibir pagos por las reservas.
-            </p>
-            {user?.mpAccessToken ? (
-                <div className="flex items-center gap-2">
-                    <span className="text-sm text-green-600">✓ Cuenta conectada</span>
-                    <Button variant="outline" onClick={handleConnect}>
-                        Reconectar cuenta
-                    </Button>
-                </div>
-            ) : (
-                <Button onClick={handleConnect}>
-                    Conectar MercadoPago
-                </Button>
-            )}
+        <div className="w-full max-w-4xl mx-auto">
+            <Card className="mx-4">
+                <CardHeader>
+                    <CardTitle>Conectar MercadoPago</CardTitle>
+                    <CardDescription>
+                        Conecta tu cuenta de MercadoPago para recibir pagos por las reservas.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {user?.mpAccessToken ? (
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                            <span className="text-sm text-green-600">✓ Cuenta conectada</span>
+                            <Button variant="outline" onClick={handleConnect}>
+                                Reconectar cuenta
+                            </Button>
+                        </div>
+                    ) : (
+                        <Button onClick={handleConnect}>
+                            Conectar MercadoPago
+                        </Button>
+                    )}
+                </CardContent>
+            </Card>
         </div>
     )
 }

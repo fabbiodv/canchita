@@ -24,10 +24,10 @@ const ResumenReserva = ({
   precio = 2000,
   fieldId = 0
 }: ResumenReservaProps) => {
-  const ADELANTO = 2000;
+  const SENIA = 2000;
   const [isPagoTotal, setIsPagoTotal] = useState(false);
 
-  const montoAPagar = isPagoTotal ? precio : ADELANTO;
+  const montoAPagar = isPagoTotal ? precio : SENIA;
 
   const handleReservar = async () => {
     try {
@@ -92,7 +92,7 @@ const ResumenReserva = ({
           </div>
 
           <p className="flex justify-between text-lg font-semibold">
-            <span>{isPagoTotal ? 'Total' : 'Adelanto'}:</span>
+            <span>{isPagoTotal ? 'Total' : 'Seña'}:</span>
             <span>${montoAPagar}</span>
           </p>
         </div>
@@ -104,7 +104,7 @@ const ResumenReserva = ({
         onClick={handleReservar}
         disabled={cancha === 'Sin seleccionar' || fecha === 'Sin seleccionar' || hora === 'Sin seleccionar'}
       >
-        Pagar {isPagoTotal ? 'Total' : 'Adelanto'}
+        Pagar {isPagoTotal ? 'Total' : 'Seña'}
       </Button>
     </Card>
   )
