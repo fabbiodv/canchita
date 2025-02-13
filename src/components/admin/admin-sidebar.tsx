@@ -9,6 +9,7 @@ import {
     Settings,
     Users,
     LandPlot,
+    MapPin,
     Menu,
 } from "lucide-react"
 import Link from "next/link"
@@ -33,25 +34,31 @@ const sidebarItems = [
         icon: Calendar,
     },
     {
+        title: "Centros de deportes",
+        href: "/admin/centers",
+        icon: MapPin,
+    },
+    {
         title: "Canchas",
         href: "/admin/fields",
         icon: LandPlot,
     },
-    {
-        title: "Pagos",
-        href: "/admin/pagos",
-        icon: CreditCard,
-    },
-    {
-        title: "Usuarios",
-        href: "/admin/usuarios",
-        icon: Users,
-    },
-    {
-        title: "Configuración",
-        href: "/admin/configuracion",
-        icon: Settings,
-    },
+    /*
+{
+    title: "Pagos",
+    href: "/admin/pagos",
+    icon: CreditCard,
+},
+{
+    title: "Usuarios",
+    href: "/admin/usuarios",
+    icon: Users,
+},
+{
+    title: "Configuración",
+    href: "/admin/configuracion",
+    icon: Settings,
+},*/
 
 
 ]
