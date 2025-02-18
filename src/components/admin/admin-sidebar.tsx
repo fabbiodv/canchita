@@ -3,11 +3,8 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
-    CreditCard,
     LayoutDashboard,
     Calendar,
-    Settings,
-    Users,
     LandPlot,
     MapPin,
     Menu,

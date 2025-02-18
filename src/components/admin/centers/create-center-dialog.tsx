@@ -11,17 +11,20 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { createCenter } from "@/utils/centers"
+import { Center } from "@/types/center"
+//import { createCenter } from "@/utils/centers"
 import { useState } from "react"
 
 interface CreateCenterDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
-    onCreateSuccess: (center: any) => void
+    onCreateSuccess: (newCenter: Center) => void
 }
 
-export function CreateCenterDialog({ open, onOpenChange, onCreateSuccess }: CreateCenterDialogProps) {
+
+export function CreateCenterDialog({ open, onOpenChange }: CreateCenterDialogProps) {
     const [isLoading, setIsLoading] = useState(false)
+
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { PlusIcon } from "lucide-react"
@@ -66,7 +66,11 @@ export default function CentersPage() {
                 open={isDialogOpen}
                 onOpenChange={setIsDialogOpen}
                 onCreateSuccess={(newCenter) => {
-                    setCenters((prev) => [...prev, newCenter])
+                    setCenters((prev) => [...prev, {
+                        ...newCenter,
+                        isActive: true,
+                        createdAt: new Date().toISOString()
+                    }])
                     setIsDialogOpen(false)
                 }}
             />
