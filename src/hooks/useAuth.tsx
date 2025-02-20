@@ -15,10 +15,11 @@ export function useAuth() {
     useEffect(() => {
         async function checkSession() {
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/session`, {
+                const url = `${process.env.NEXT_PUBLIC_API_URL}/auth/session`
+                console.log('Request URL:', url) // Agregar este log
+                const response = await fetch(url, {
                     credentials: 'include'
                 })
-
                 if (response.ok) {
                     const data = await response.json()
                     setUser(data.user)
