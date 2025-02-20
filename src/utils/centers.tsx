@@ -26,17 +26,20 @@ export const createCenter = async (center: Center) => {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/centers`, {
             method: 'POST',
             body: JSON.stringify(center),
-            credentials: 'include'
-        });
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
 
         if (!response.ok) {
             throw new Error('Error al crear centro deportivo');
         }
 
-        const data = await response.json();
-        return data;
+        const data = await response.json()
+        return data
     } catch (error) {
-        console.error('Error:', error);
-        throw error;
+        console.error('Error:', error)
+        throw error
     }
 };

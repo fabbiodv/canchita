@@ -21,16 +21,6 @@ import {
 
 const sidebarItems = [
     {
-        title: "Dashboard",
-        href: "/admin",
-        icon: LayoutDashboard,
-    },
-    {
-        title: "Reservas",
-        href: "/admin/reservas",
-        icon: Calendar,
-    },
-    {
         title: "Centros de deportes",
         href: "/admin/centers",
         icon: MapPin,
@@ -41,6 +31,16 @@ const sidebarItems = [
         icon: LandPlot,
     },
     /*
+    {
+        title: "Dashboard",
+        href: "/admin",
+        icon: LayoutDashboard,
+    },
+    {
+        title: "Reservas",
+        href: "/admin/reservas",
+        icon: Calendar,
+    },
 {
     title: "Pagos",
     href: "/admin/pagos",
