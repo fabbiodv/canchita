@@ -31,7 +31,7 @@ const ResumenReserva = ({
 
   const handleReservar = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND_URL}/payments/create-preference`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payments/create-preference`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

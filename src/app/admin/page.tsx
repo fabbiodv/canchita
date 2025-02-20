@@ -11,7 +11,7 @@ export default function ConnectMercadoPago() {
     const handleConnect = async () => {
         try {
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BACKEND_URL}/auth/connect-mercadopago`,
+                `${process.env.NEXT_PUBLIC_API_URL}/auth/connect-mercadopago`,
                 {
                     method: 'POST',
                     credentials: 'include',

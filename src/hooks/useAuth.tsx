@@ -15,7 +15,7 @@ export function useAuth() {
     useEffect(() => {
         async function checkSession() {
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND_URL}/auth/session`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/session`, {
                     credentials: 'include'
                 })
 

@@ -60,7 +60,7 @@ export default function ReservePage({ params }: PageProps) {
 
             try {
                 const response = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_BACKEND_URL}/fields/center/${centerId}/availability?date=${format(selectedDate, 'yyyy-MM-dd')}`
+                    `${process.env.NEXT_PUBLIC_API_URL}/fields/center/${centerId}/availability?date=${format(selectedDate, 'yyyy-MM-dd')}`
                 )
                 const data = await response.json()
 
@@ -101,7 +101,7 @@ export default function ReservePage({ params }: PageProps) {
         async function fetchCenterDetails() {
             try {
                 const response = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_BACKEND_URL}/centers/${centerId}`
+                    `${process.env.NEXT_PUBLIC_API_URL}/centers/${centerId}`
                 )
                 const data = await response.json()
                 setCenter(data)

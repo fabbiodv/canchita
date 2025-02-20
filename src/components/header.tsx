@@ -10,7 +10,7 @@ export default function Header() {
 
     const handleLogout = async () => {
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND_URL}/auth/logout`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
                 method: 'POST',
                 credentials: 'include'
             })

@@ -3,7 +3,7 @@ import { Center } from "@/types/center"
 export const fetchUserCenters = async () => {
     try {
         const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BACKEND_URL}/centers/user/centers`,
+            `${process.env.NEXT_PUBLIC_API_URL}/centers/user/centers`,
             {
                 credentials: 'include'
             }
@@ -23,7 +23,7 @@ export const fetchUserCenters = async () => {
 
 export const createCenter = async (center: Center) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BACKEND_URL}/centers`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/centers`, {
             method: 'POST',
             body: JSON.stringify(center),
             credentials: 'include'
