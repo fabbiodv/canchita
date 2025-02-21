@@ -39,32 +39,42 @@ export default function CentersPage() {
                     </Button>
                 </CardHeader>
                 <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Nombre</TableHead>
-                                <TableHead>Dirección</TableHead>
-                                <TableHead>Estado</TableHead>
-                                <TableHead>Fecha de creación</TableHead>
-                                <TableHead>Acciones</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {centers.map((center) => (
-                                <TableRow key={center.id}>
-                                    <TableCell>{center.name}</TableCell>
-                                    <TableCell>{center.address}</TableCell>
-                                    <TableCell>{center.isActive ? 'Activo' : 'Inactivo'}</TableCell>
-                                    <TableCell>{new Date(center.createdAt).toLocaleDateString()}</TableCell>
-                                    <TableCell>
-                                        <Button variant="ghost" size="sm">
-                                            Editar
-                                        </Button>
-                                    </TableCell>
+                    {centers.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-12 text-center">
+                            <h3 className="mt-2 text-lg font-semibold">No hay centros deportivos</h3>
+                            <p className="mt-1 text-sm text-muted-foreground">
+                                Para comenzar a alquilar canchas, primero debes crear un centro deportivo.
+                            </p>
+
+                        </div>
+                    ) : (
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Nombre</TableHead>
+                                    <TableHead>Dirección</TableHead>
+                                    <TableHead>Estado</TableHead>
+                                    <TableHead>Fecha de creación</TableHead>
+                                    <TableHead>Acciones</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {centers.map((center) => (
+                                    <TableRow key={center.id}>
+                                        <TableCell>{center.name}</TableCell>
+                                        <TableCell>{center.address}</TableCell>
+                                        <TableCell>{center.isActive ? 'Activo' : 'Inactivo'}</TableCell>
+                                        <TableCell>{new Date(center.createdAt).toLocaleDateString()}</TableCell>
+                                        <TableCell>
+                                            <Button variant="ghost" size="sm">
+                                                Editar
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    )}
                 </CardContent>
             </Card>
 

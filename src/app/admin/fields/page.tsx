@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { PlusIcon } from "lucide-react"
@@ -10,20 +10,28 @@ import { Field } from "@/types/field"
 import { fetchUserCenters } from "@/utils/centers"
 import { Center } from "@/types/center"
 import { CreateFieldDialog } from "@/components/admin/fields/create-field-dialog"
+import { EditFieldDialog } from "@/components/admin/fields/edit-field-dialog"
 
 
 export default function FieldsPage() {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [fields, setFields] = useState<Field[]>([])
     const [centers, setCenters] = useState<Center[]>([])
-    useEffect(() => {
-        fetchFields().then((fields) => {
-            setFields(fields)
-        })
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+    const [selectedField, setSelectedField] = useState<Field | null>(null)
 
-        fetchUserCenters().then((centers) => {
-            setCenters(centers)
-        })
+    useEffect(() => {
+        async function loadFields() {
+            try {
+                const fields = await fetchFields()
+                setFields(fields)
+                const centers = await fetchUserCenters()
+                setCenters(centers)
+            } catch (error) {
+                console.error('Error fetching fields:', error)
+            }
+        }
+        loadFields()
     }, [])
 
     const statusMap = {
@@ -44,62 +52,87 @@ export default function FieldsPage() {
         HARD_COURT: 'Pista dura',
     }
 
-    return (
-        <div className="space-y-4">
-            <Card>
-                <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-                    <div>
-                        <CardTitle>Canchas</CardTitle>
-                        <CardDescription>Gestiona las canchas disponibles en tus centros deportivos</CardDescription>
-                    </div>
-                    <Button onClick={() => setIsDialogOpen(true)}>
-                        <PlusIcon className="mr-2 h-4 w-4" />
-                        Crear cancha
-                    </Button>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Nombre</TableHead>
-                                <TableHead>Tipo</TableHead>
-                                <TableHead>Superficie</TableHead>
-                                <TableHead>Precio</TableHead>
-                                <TableHead>Estado</TableHead>
-                                <TableHead>Centro deportivo</TableHead>
-                                <TableHead>Acciones</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {fields.map((field) => (
-                                <TableRow key={field.id}>
-                                    <TableCell>{field.name}</TableCell>
-                                    <TableCell>{typeMap[field.type as keyof typeof typeMap]}</TableCell>
-                                    <TableCell>{surfaceMap[field.surface as keyof typeof surfaceMap]}</TableCell>
-                                    <TableCell>${field.price}</TableCell>
-                                    <TableCell>{statusMap[field.status]}</TableCell>
-                                    <TableCell>{centers.find(c => c.id === field.centerId)?.name}</TableCell>
-                                    <TableCell>
-                                        <Button variant="ghost" size="sm">
-                                            Editar
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
+    const handleEditSuccess = (updatedField: Field) => {
+        setFields(currentFields =>
+            currentFields.map(field =>
+                field.id === updatedField.id ? updatedField : field
+            )
+        )
+    }
 
-            <CreateFieldDialog
-                open={isDialogOpen}
-                onOpenChange={setIsDialogOpen}
-                centers={centers}
-                fields={fields}
-                onCreateSuccess={(newField) => {
-                    setFields((prev) => [...prev, newField])
-                }}
-            />
-        </div >
+    return (
+        <Suspense fallback={<div>Cargando...</div>}>
+            <div className="space-y-4">
+                <Card>
+                    <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+                        <div>
+                            <CardTitle>Canchas</CardTitle>
+                            <CardDescription>Gestiona las canchas disponibles en tus centros deportivos</CardDescription>
+                        </div>
+                        <Button onClick={() => setIsDialogOpen(true)}>
+                            <PlusIcon className="mr-2 h-4 w-4" />
+                            Crear cancha
+                        </Button>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Nombre</TableHead>
+                                    <TableHead>Tipo</TableHead>
+                                    <TableHead>Superficie</TableHead>
+                                    <TableHead>Precio</TableHead>
+                                    <TableHead>Estado</TableHead>
+                                    <TableHead>Centro deportivo</TableHead>
+                                    <TableHead>Acciones</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {fields.length > 0 ? fields.map((field) => (
+                                    <TableRow key={field.id}>
+                                        <TableCell>{field.name}</TableCell>
+                                        <TableCell>{typeMap[field.type as keyof typeof typeMap]}</TableCell>
+                                        <TableCell>{surfaceMap[field.surface as keyof typeof surfaceMap]}</TableCell>
+                                        <TableCell>${field.price}</TableCell>
+                                        <TableCell>{statusMap[field.status]}</TableCell>
+                                        <TableCell>{centers.find(c => c.id === field.centerId)?.name}</TableCell>
+                                        <TableCell>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => {
+                                                    setSelectedField(field)
+                                                    setIsEditDialogOpen(true)
+                                                }}
+                                            >
+                                                Editar
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                )) : <TableRow><TableCell colSpan={7} className="text-center">No hay canchas disponibles</TableCell></TableRow>}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+
+                <CreateFieldDialog
+                    open={isDialogOpen}
+                    onOpenChange={setIsDialogOpen}
+                    centers={centers}
+                    fields={fields}
+                    onCreateSuccess={(newField) => {
+                        setFields(currentFields => Array.isArray(currentFields) ? [...currentFields, newField] : [newField]);
+                    }}
+                />
+
+                <EditFieldDialog
+                    open={isEditDialogOpen}
+                    onOpenChange={setIsEditDialogOpen}
+                    field={selectedField}
+                    centers={centers}
+                    onEditSuccess={handleEditSuccess}
+                />
+            </div>
+        </Suspense>
     )
 }
