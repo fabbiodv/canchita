@@ -52,6 +52,7 @@ export default function ReservationsPage() {
         <Table>
             <TableHeader>
                 <TableRow>
+                    <TableHead>ID</TableHead>
                     <TableHead>Cancha</TableHead>
                     <TableHead>Centro deportivo</TableHead>
                     <TableHead>Cliente</TableHead>
@@ -79,6 +80,7 @@ export default function ReservationsPage() {
                 ) : (
                     reservations.map((reservation) => (
                         <TableRow key={reservation.id}>
+                            <TableCell>{reservation.id}</TableCell>
                             <TableCell>{reservation.fieldName}</TableCell>
                             <TableCell>{reservation.centerName}</TableCell>
                             <TableCell>{reservation.customerEmail}</TableCell>

@@ -41,6 +41,7 @@ export default function BookingsPage() {
                     <Table>
                         <TableHeader>
                             <TableRow>
+                                <TableHead>ID</TableHead>
                                 <TableHead>Cancha</TableHead>
                                 <TableHead>Centro Deportivo</TableHead>
                                 <TableHead>Fecha</TableHead>
@@ -52,6 +53,7 @@ export default function BookingsPage() {
                         <TableBody>
                             {bookings.map((booking) => (
                                 <TableRow key={booking.id}>
+                                    <TableCell>{booking.id}</TableCell>
                                     <TableCell>{booking.fieldName}</TableCell>
                                     <TableCell>{booking.centerName}</TableCell>
                                     <TableCell>{new Date(booking.date).toLocaleDateString()}</TableCell>
