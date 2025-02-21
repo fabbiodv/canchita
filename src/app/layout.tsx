@@ -29,14 +29,15 @@ export const metadata: Metadata = {
     description: "Reserva tu cancha de fútbol de manera fácil y rápida",
     type: "website",
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-  },
   robots: {
     index: true,
     follow: true,
   },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({

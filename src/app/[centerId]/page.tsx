@@ -9,6 +9,7 @@ import ResumenReserva from '@/components/reserva/resumen-reserva'
 import { ReservaCalendario } from '@/components/reserva/reserva-calendario'
 import { SelectorCancha } from '@/components/reserva/selector-cancha'
 import { SelectorHorario } from '@/components/reserva/select-horario'
+import Link from 'next/link'
 
 interface Center {
     id: number
@@ -20,6 +21,8 @@ interface Center {
         phone?: string
         email?: string
     }
+    notFound?: boolean
+    error?: boolean
 }
 
 interface Field {
@@ -129,7 +132,13 @@ export default function ReservePage({ params }: PageProps) {
                 )
 
                 if (response.status === 404) {
-                    setCenter({ notFound: true } as any)
+                    setCenter({
+                        id: 0,
+                        name: '',
+                        address: '',
+                        isAvailableForBooking: false,
+                        notFound: true
+                    })
                     return
                 }
 
@@ -141,7 +150,13 @@ export default function ReservePage({ params }: PageProps) {
                 setCenter(data)
             } catch (error) {
                 console.error('Error al cargar detalles del centro:', error)
-                setCenter({ error: true } as any)
+                setCenter({
+                    id: 0,
+                    name: '',
+                    address: '',
+                    isAvailableForBooking: false,
+                    error: true
+                })
             }
         }
 
@@ -153,9 +168,9 @@ export default function ReservePage({ params }: PageProps) {
             <div className="min-h-screen flex flex-col items-center justify-center gap-4">
                 <h2 className="text-2xl font-semibold text-gray-800">Centro deportivo no encontrado</h2>
                 <p className="text-gray-500">El centro que buscas no existe o no está disponible</p>
-                <a href="/" className="text-blue-600 hover:text-blue-800 underline">
+                <Link href="/" className="text-blue-600 hover:text-blue-800 underline">
                     Volver al inicio
-                </a>
+                </Link>
             </div>
         )
     }
@@ -165,9 +180,9 @@ export default function ReservePage({ params }: PageProps) {
             <div className="min-h-screen flex flex-col items-center justify-center gap-4">
                 <h2 className="text-2xl font-semibold text-gray-800">Error inesperado</h2>
                 <p className="text-gray-500">Hubo un problema al cargar el centro deportivo</p>
-                <a href="/" className="text-blue-600 hover:text-blue-800 underline">
+                <Link href="/" className="text-blue-600 hover:text-blue-800 underline">
                     Volver al inicio
-                </a>
+                </Link>
             </div>
         )
     }
