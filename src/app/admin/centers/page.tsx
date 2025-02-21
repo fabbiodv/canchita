@@ -28,7 +28,7 @@ export default function CentersPage() {
     return (
         <div className="space-y-4">
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
+                <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
                     <div>
                         <CardTitle>Centros deportivos</CardTitle>
                         <CardDescription>Gestiona los centros deportivos disponibles en la plataforma</CardDescription>

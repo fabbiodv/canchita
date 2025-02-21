@@ -47,7 +47,7 @@ export default function FieldsPage() {
     return (
         <div className="space-y-4">
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
+                <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
                     <div>
                         <CardTitle>Canchas</CardTitle>
                         <CardDescription>Gestiona las canchas disponibles en tus centros deportivos</CardDescription>
