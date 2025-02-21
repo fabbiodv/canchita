@@ -36,10 +36,10 @@ export const createCenter = async (center: Center) => {
             throw new Error('Error al crear centro deportivo');
         }
 
-        const data = await response.json()
-        return data
+        const data = await response.json();
+        return data;
     } catch (error) {
-        console.error('Error:', error)
-        throw error
+        console.error('Error:', error);
+        throw error;
     }
 };

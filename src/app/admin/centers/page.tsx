@@ -68,6 +68,7 @@ export default function CentersPage() {
                 onCreateSuccess={(newCenter) => {
                     setCenters((prev) => [...prev, {
                         ...newCenter,
+                        id: newCenter.id.toString(),
                         isActive: true,
                         createdAt: new Date().toISOString()
                     }])

@@ -5,8 +5,6 @@ import { useEffect, useState } from "react"
 import { es } from "date-fns/locale"
 import { format } from 'date-fns'
 import { startOfDay } from 'date-fns'
-import { PhoneIcon, MailIcon, AlertCircle } from "lucide-react"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import ResumenReserva from '@/components/reserva/resumen-reserva'
 import { ReservaCalendario } from '@/components/reserva/reserva-calendario'
 import { SelectorCancha } from '@/components/reserva/selector-cancha'
@@ -51,6 +49,7 @@ export default function ReservePage({ params }: PageProps) {
     const [selectedField, setSelectedField] = useState<string>("")
     const [selectedDate, setSelectedDate] = useState<Date>()
     const [selectedTime, setSelectedTime] = useState<string>("")
+    const [selectedEndTime, setSelectedEndTime] = useState<string>("")
     const [availableTimeSlots, setAvailableTimeSlots] = useState<TimeSlot[]>([])
 
     // Cargar disponibilidad cuando cambia la fecha
@@ -89,7 +88,22 @@ export default function ReservePage({ params }: PageProps) {
         } else {
             setAvailableTimeSlots([])
         }
+        // Resetear el horario seleccionado cuando cambia la cancha
+        setSelectedTime("")
+        setSelectedEndTime("")
     }, [selectedField, fields])
+
+    // Agregar efecto para actualizar horario fin
+    useEffect(() => {
+        if (selectedTime && availableTimeSlots.length > 0) {
+            const currentSlot = availableTimeSlots.find(slot => slot.startTime === selectedTime)
+            if (currentSlot) {
+                setSelectedEndTime(currentSlot.endTime)
+            }
+        } else {
+            setSelectedEndTime("")
+        }
+    }, [selectedTime, availableTimeSlots])
 
     const isDateDisabled = (date: Date) => {
         const startOfToday = startOfDay(new Date())
@@ -125,61 +139,39 @@ export default function ReservePage({ params }: PageProps) {
         <div className='min-h-screen'>
             <main className='container mx-auto px-4 max-w-4xl'>
 
-                <h1 className='text-2xl font-bold mb-6 text-center'>{center?.name}</h1>
-                {!center.isAvailableForBooking ? (
-                    <Alert variant="destructive" className="mb-6">
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertTitle>Centro no disponible para reservas online</AlertTitle>
-                        <AlertDescription className="space-y-4">
-                            <p>{center.contactInfo?.message}</p>
-                            <div className="space-y-2">
-                                <p className="text-sm font-semibold">Contactar al centro:</p>
-                                {center.contactInfo?.phone && (
-                                    <p className="flex items-center gap-2">
-                                        <PhoneIcon className="h-4 w-4" />
-                                        <span>{center.contactInfo.phone}</span>
-                                    </p>
-                                )}
-                                {center.contactInfo?.email && (
-                                    <p className="flex items-center gap-2">
-                                        <MailIcon className="h-4 w-4" />
-                                        <span>{center.contactInfo.email}</span>
-                                    </p>
-                                )}
-                            </div>
-                        </AlertDescription>
-                    </Alert>
-                ) : (
-                    <div className='grid gap-8 md:grid-cols-[1fr_300px]'>
-                        <div className='space-y-6'>
-                            <ReservaCalendario
-                                selectedDate={selectedDate}
-                                onSelectDate={setSelectedDate}
-                                isDateDisabled={isDateDisabled}
-                            />
-                            <SelectorCancha
-                                fields={fields}
-                                selectedField={selectedField}
-                                onFieldSelect={setSelectedField}
-                                disabled={!selectedDate}
-                            />
-                            <SelectorHorario
-                                timeSlots={availableTimeSlots}
-                                selectedTime={selectedTime}
-                                onTimeSelect={setSelectedTime}
-                                disabled={!selectedField}
-                            />
-                        </div>
-                        <ResumenReserva
-                            address={center?.address}
-                            fieldId={selectedField ? fields.find(f => f.id.toString() === selectedField)?.id : undefined}
-                            cancha={selectedField ? fields.find(f => f.id.toString() === selectedField)?.name : undefined}
-                            fecha={selectedDate ? format(selectedDate, 'dd/MM/yyyy', { locale: es }) : undefined}
-                            hora={selectedTime}
-                            precio={selectedField ? fields.find(f => f.id.toString() === selectedField)?.price : undefined}
+                <h1 className='text-2xl font-bold my-6 text-center'>{center?.name}</h1>
+
+                <div className='grid gap-8 md:grid-cols-[1fr_300px]'>
+                    <div className='space-y-6'>
+                        <ReservaCalendario
+                            selectedDate={selectedDate}
+                            onSelectDate={setSelectedDate}
+                            isDateDisabled={isDateDisabled}
+                        />
+                        <SelectorCancha
+                            fields={fields}
+                            selectedField={selectedField}
+                            onFieldSelect={setSelectedField}
+                            disabled={!selectedDate}
+                        />
+                        <SelectorHorario
+                            timeSlots={availableTimeSlots}
+                            selectedTime={selectedTime}
+                            onTimeSelect={setSelectedTime}
+                            disabled={!selectedField}
                         />
                     </div>
-                )}
+                    <ResumenReserva
+                        address={center?.address}
+                        fieldId={selectedField ? fields.find(f => f.id.toString() === selectedField)?.id : undefined}
+                        cancha={selectedField ? fields.find(f => f.id.toString() === selectedField)?.name : undefined}
+                        fecha={selectedDate ? format(selectedDate, 'dd/MM/yyyy', { locale: es }) : undefined}
+                        hora={selectedTime}
+                        horaFin={selectedEndTime}
+                        precio={selectedField ? fields.find(f => f.id.toString() === selectedField)?.price : undefined}
+                    />
+                </div>
+
             </main>
         </div >
     )
