@@ -106,8 +106,18 @@ export default function ReservePage({ params }: PageProps) {
     }, [selectedTime, availableTimeSlots])
 
     const isDateDisabled = (date: Date) => {
-        const startOfToday = startOfDay(new Date())
-        return date < startOfToday
+        const now = new Date()
+        const twoHoursFromNow = new Date(now.getTime() + (2 * 60 * 60 * 1000))
+
+        // Si es un día anterior, deshabilitar
+        if (startOfDay(date) < startOfDay(now)) return true
+
+        // Si es el día actual, verificar que sea al menos 2 horas después
+        if (startOfDay(date).getTime() === startOfDay(now).getTime()) {
+            return date < twoHoursFromNow
+        }
+
+        return false
     }
 
     // Cargar detalles del centro

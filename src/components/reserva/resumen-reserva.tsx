@@ -1,8 +1,10 @@
 'use client'
 
+import { useAuth } from "@/hooks/useAuth"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { toast } from "sonner"
 import { createBooking } from "@/utils/bookings"
 
 interface ResumenReservaProps {
@@ -10,9 +12,9 @@ interface ResumenReservaProps {
   cancha?: string
   fecha?: string
   hora?: string
-  precio?: number
   fieldId?: number
   horaFin?: string
+  precio?: number
 }
 
 const ResumenReserva = ({
@@ -24,20 +26,27 @@ const ResumenReserva = ({
   horaFin = '',
   precio = 0
 }: ResumenReservaProps) => {
+  const { user } = useAuth()
+  const router = useRouter()
 
-  const isDisabled = !cancha || !fecha || !hora || !fieldId;
+  const isDisabled = !cancha || !fecha || !hora || !fieldId
 
   const handleReservar = async () => {
-    console.log(fieldId, fecha, hora, horaFin, precio)
-    try {
-      const data = await createBooking(fieldId, fecha, hora, horaFin, precio)
-      console.log(data)
-      toast.success('Reserva creada correctamente');
-    } catch (error) {
-      console.error('Error al procesar la reserva:', error)
-      toast.error('Error al procesar la reserva');
+    // Verificar si el usuario está autenticado
+    if (!user) {
+      toast.error('Debes iniciar sesión para realizar una reserva')
+      router.push('/login')
+      return
     }
 
+    try {
+      await createBooking(fieldId, fecha, hora, horaFin, precio)
+      toast.success('Reserva creada correctamente')
+      router.push('/profile/bookings')
+    } catch (error) {
+      console.error('Error al procesar la reserva:', error)
+      toast.error('Error al procesar la reserva')
+    }
   }
 
   return (
@@ -62,7 +71,12 @@ const ResumenReserva = ({
           <span className="text-gray-600">Hora:</span>
           <span className="font-medium">{hora}</span>
         </p>
-
+        {precio > 0 && (
+          <p className="flex justify-between">
+            <span className="text-gray-600">Precio:</span>
+            <span className="font-medium">${precio}</span>
+          </p>
+        )}
       </div>
 
       <Button
@@ -71,7 +85,7 @@ const ResumenReserva = ({
         onClick={handleReservar}
         disabled={isDisabled}
       >
-        Reservar
+        {!user ? 'Inicia sesión para reservar' : 'Reservar'}
       </Button>
     </Card>
   )

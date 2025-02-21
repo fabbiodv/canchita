@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { PlusIcon } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { CreateCenterDialog } from "@/components/admin/centers/create-center-dialog"
-
+import { fetchUserCenters } from "@/utils/centers"
 interface SportCenter {
     id: string
     name: string
@@ -18,6 +18,12 @@ interface SportCenter {
 export default function CentersPage() {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [centers, setCenters] = useState<SportCenter[]>([])
+
+    useEffect(() => {
+        fetchUserCenters().then((centers) => {
+            setCenters(centers)
+        })
+    }, [])
 
     return (
         <div className="space-y-4">

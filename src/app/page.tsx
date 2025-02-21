@@ -21,7 +21,7 @@ export default function Home() {
               className='bg-[#009ee3] hover:bg-[#008ed0] text-white px-8 py-6 text-lg'
               asChild
             >
-              <Link href="/centers">Reservar Cancha</Link>
+              <Link href="/1">Reservar Cancha</Link>
             </Button>
             <Button
               variant="outline"

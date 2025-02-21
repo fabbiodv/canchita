@@ -24,3 +24,19 @@ export const createBooking = async (fieldId: number, date: string, startTime: st
         throw error
     }
 }
+
+export const fetchMyBookings = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookings/user`, {
+            method: 'GET',
+            credentials: 'include',
+        })
+        if (!response.ok) {
+            throw new Error('Error al obtener las reservas')
+        }
+        return await response.json()
+    } catch (error) {
+        console.error('Error al obtener las reservas:', error)
+        throw error
+    }
+}

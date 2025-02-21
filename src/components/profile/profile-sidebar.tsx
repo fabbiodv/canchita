@@ -3,9 +3,8 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
-    LandPlot,
-    MapPin,
-    Menu
+    Menu,
+    Calendar
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -18,15 +17,11 @@ import {
 } from "@/components/ui/sheet"
 
 const sidebarItems = [
+
     {
-        title: "Centros de deportes",
-        href: "/admin/centers",
-        icon: MapPin,
-    },
-    {
-        title: "Canchas",
-        href: "/admin/fields",
-        icon: LandPlot,
+        title: "Mis reservas",
+        href: "/profile/bookings",
+        icon: Calendar,
     },
     /*
     {
@@ -59,7 +54,7 @@ function SidebarContent() {
     return (
         <div className="space-y-4">
             <div className="px-3 py-2">
-                <h2 className="mb-2 px-4 text-lg font-semibold">Administrador</h2>
+                <h2 className="mb-2 px-4 text-lg font-semibold">Perfil</h2>
                 <div className="space-y-1">
                     {sidebarItems.map((item) => (
                         <Button
@@ -80,7 +75,7 @@ function SidebarContent() {
     )
 }
 
-export function AdminSidebar() {
+export function ProfileSidebar() {
     return (
         <>
             {/* Versión móvil */}
@@ -92,7 +87,7 @@ export function AdminSidebar() {
                 </SheetTrigger>
                 <SheetContent side="left" className="w-64 p-0">
                     <SheetHeader className="sr-only">
-                        <SheetTitle>Panel de Administración</SheetTitle>
+                        <SheetTitle>Perfil</SheetTitle>
                     </SheetHeader>
                     <SidebarContent />
                 </SheetContent>

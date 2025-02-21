@@ -13,7 +13,7 @@ const AuthCallback = () => {
     useEffect(() => {
         if (status === 'success') {
             toast.success('Inicio de sesión exitoso')
-            router.push('/1') // O la ruta que desees después del login
+            router.push('/admin') // O la ruta que desees después del login
         } else if (error) {
             toast.error('Error en la autenticación')
             router.push('/login')
