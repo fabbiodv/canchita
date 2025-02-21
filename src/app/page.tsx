@@ -13,7 +13,7 @@ export default function Home() {
             La forma más fácil de jugar al
             <span className='text-[#009ee3] block mt-2'>Fútbol</span>
           </h1>
-          <p className='text-lg md:text-xl text-gray-600 mb-6 md:mb-8 max-w-2xl mx-auto px-4'>
+          <p className='text-lg md:text-xl mb-6 md:mb-8 max-w-2xl mx-auto px-4'>
             Reservá las mejores canchas de fútbol al instante.
           </p>
           <div className='flex flex-col sm:flex-row gap-4 justify-center px-4'>

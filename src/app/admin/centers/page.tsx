@@ -55,7 +55,6 @@ export default function CentersPage() {
                                     <TableHead>Dirección</TableHead>
                                     <TableHead>Estado</TableHead>
                                     <TableHead>Fecha de creación</TableHead>
-                                    <TableHead>Acciones</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -65,11 +64,7 @@ export default function CentersPage() {
                                         <TableCell>{center.address}</TableCell>
                                         <TableCell>{center.isActive ? 'Activo' : 'Inactivo'}</TableCell>
                                         <TableCell>{new Date(center.createdAt).toLocaleDateString()}</TableCell>
-                                        <TableCell>
-                                            <Button variant="ghost" size="sm">
-                                                Editar
-                                            </Button>
-                                        </TableCell>
+
                                     </TableRow>
                                 ))}
                             </TableBody>

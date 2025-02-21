@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { PlusIcon } from "lucide-react"
+import { PencilIcon, PlusIcon } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { fetchFields } from "@/utils/fields"
 import { Field } from "@/types/field"
@@ -105,7 +105,7 @@ export default function FieldsPage() {
                                                     setIsEditDialogOpen(true)
                                                 }}
                                             >
-                                                Editar
+                                                <PencilIcon className=" h-4 w-4" />
                                             </Button>
                                         </TableCell>
                                     </TableRow>

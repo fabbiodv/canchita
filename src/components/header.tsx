@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { Menu } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { useState } from "react"
+import { ThemeToggle } from "@/components/layout/theme-toggle"
 
 const Header = () => {
     const { user, isLoading } = useAuth()
@@ -31,6 +32,7 @@ const Header = () => {
 
     const NavigationItems = () => (
         <div className="flex flex-col md:flex-row items-center gap-4">
+            <ThemeToggle />
             {isLoading ? (
                 <span className="text-sm text-gray-500">Cargando...</span>
             ) : user ? (
