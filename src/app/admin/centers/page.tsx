@@ -81,7 +81,7 @@ export default function CentersPage() {
                         ...newCenter,
                         id: newCenter.id.toString(),
                         isActive: true,
-                        createdAt: new Date().toISOString()
+                        createdAt: new Date().toLocaleString('en-US', { timeZone: 'America/Argentina/Buenos_Aires' })
                     }])
                     setIsDialogOpen(false)
                 }}

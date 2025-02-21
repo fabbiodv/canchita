@@ -4,12 +4,12 @@ import { use } from "react"
 import { useEffect, useState } from "react"
 import { es } from "date-fns/locale"
 import { format } from 'date-fns'
-import { startOfDay } from 'date-fns'
 import ResumenReserva from '@/components/reserva/resumen-reserva'
 import { ReservaCalendario } from '@/components/reserva/reserva-calendario'
 import { SelectorCancha } from '@/components/reserva/selector-cancha'
 import { SelectorHorario } from '@/components/reserva/select-horario'
 import Link from 'next/link'
+import { isDateDisabled } from '@/utils/dates'
 
 interface Center {
     id: number
@@ -87,14 +87,34 @@ export default function ReservePage({ params }: PageProps) {
     useEffect(() => {
         if (selectedField && fields.length > 0) {
             const field = fields.find(f => f.id.toString() === selectedField)
-            setAvailableTimeSlots(field?.availability || [])
+
+            // Obtener fecha actual en Argentina
+            const now = new Date();
+            const argentinaOffset = -3 * 60; // -3 horas en minutos
+            const nowInArgentina = new Date(now.getTime() + (now.getTimezoneOffset() + argentinaOffset) * 60000);
+
+            // Filtrar slots disponibles
+            const filteredSlots = field?.availability?.filter(slot => {
+                if (!selectedDate) return false;
+
+                // Crear fecha completa para el horario del slot
+                const [hours, minutes] = slot.startTime.split(':');
+                const slotDateTime = new Date(selectedDate);
+                slotDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+                // Verificar si hay al menos 2 horas de diferencia
+                const twoHoursInMs = 2 * 60 * 60 * 1000;
+                return slotDateTime.getTime() - nowInArgentina.getTime() >= twoHoursInMs;
+            }) || [];
+
+            setAvailableTimeSlots(filteredSlots);
         } else {
-            setAvailableTimeSlots([])
+            setAvailableTimeSlots([]);
         }
         // Resetear el horario seleccionado cuando cambia la cancha
-        setSelectedTime("")
-        setSelectedEndTime("")
-    }, [selectedField, fields])
+        setSelectedTime("");
+        setSelectedEndTime("");
+    }, [selectedField, fields, selectedDate]);
 
     // Agregar efecto para actualizar horario fin
     useEffect(() => {
@@ -108,20 +128,7 @@ export default function ReservePage({ params }: PageProps) {
         }
     }, [selectedTime, availableTimeSlots])
 
-    const isDateDisabled = (date: Date) => {
-        const now = new Date()
-        const twoHoursFromNow = new Date(now.getTime() + (2 * 60 * 60 * 1000))
 
-        // Si es un día anterior, deshabilitar
-        if (startOfDay(date) < startOfDay(now)) return true
-
-        // Si es el día actual, verificar que sea al menos 2 horas después
-        if (startOfDay(date).getTime() === startOfDay(now).getTime()) {
-            return date < twoHoursFromNow
-        }
-
-        return false
-    }
 
     // Cargar detalles del centro
     useEffect(() => {
