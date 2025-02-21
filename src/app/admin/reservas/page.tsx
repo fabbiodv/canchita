@@ -26,20 +26,22 @@ export default function ReservationsPage() {
     const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
-        setIsLoading(true)
-        fetchBookings()
-            .then((data) => {
-                setUpcomingReservations(data.upcomingBookings)
-                setPastReservations(data.pastBookings)
-            })
-            .catch((error) => {
+        async function loadReservations() {
+            try {
+                setIsLoading(true)
+                const data = await fetchBookings()
+                setUpcomingReservations(data?.upcomingBookings ?? [])
+                setPastReservations(data?.pastBookings ?? [])
+            } catch (error) {
                 console.error('Error fetching reservations:', error)
                 setUpcomingReservations([])
                 setPastReservations([])
-            })
-            .finally(() => {
+            } finally {
                 setIsLoading(false)
-            })
+            }
+        }
+
+        loadReservations()
     }, [])
 
     const statusMap: Record<string, string> = {
@@ -48,7 +50,7 @@ export default function ReservationsPage() {
         CANCELLED: 'Cancelada'
     }
 
-    const ReservationsTable = ({ reservations }: { reservations: Reservation[] }) => (
+    const ReservationsTable = ({ reservations = [] }: { reservations: Reservation[] }) => (
         <Table>
             <TableHeader>
                 <TableRow>
