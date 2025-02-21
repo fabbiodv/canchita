@@ -28,7 +28,7 @@ export default function Home() {
               className='px-8 py-6 text-lg'
               asChild
             >
-              <Link href="/precios">Ver Precios</Link>
+              <Link href="/admin/centers">Alquila tu cancha </Link>
             </Button>
           </div>
         </section>
