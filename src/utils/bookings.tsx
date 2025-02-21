@@ -40,3 +40,16 @@ export const fetchMyBookings = async () => {
         throw error
     }
 }
+
+export const fetchBookings = async () => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookings/my-center`, {
+            method: 'GET',
+            credentials: 'include',
+        })
+        return await response.json()
+    } catch (error) {
+        console.error('Error al obtener las reservas:', error)
+        throw error
+    }
+}

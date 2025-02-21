@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button"
 import {
     LandPlot,
     MapPin,
-    Menu
+    Menu,
+    Calendar
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -27,6 +28,11 @@ const sidebarItems = [
         title: "Canchas",
         href: "/admin/fields",
         icon: LandPlot,
+    },
+    {
+        title: "Reservas",
+        href: "/admin/reservas",
+        icon: Calendar,
     },
     /*
     {

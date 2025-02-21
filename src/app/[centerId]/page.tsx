@@ -127,20 +127,47 @@ export default function ReservePage({ params }: PageProps) {
                 const response = await fetch(
                     `${process.env.NEXT_PUBLIC_API_URL}/centers/${centerId}`
                 )
+
+                if (response.status === 404) {
+                    setCenter({ notFound: true } as any)
+                    return
+                }
+
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}: ${response.statusText}`)
+                }
+
                 const data = await response.json()
                 setCenter(data)
             } catch (error) {
                 console.error('Error al cargar detalles del centro:', error)
+                setCenter({ error: true } as any)
             }
         }
 
         fetchCenterDetails()
     }, [centerId])
 
-    if (!center) {
+    if (center?.notFound) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <p className="text-gray-500">Cargando...</p>
+            <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+                <h2 className="text-2xl font-semibold text-gray-800">Centro deportivo no encontrado</h2>
+                <p className="text-gray-500">El centro que buscas no existe o no está disponible</p>
+                <a href="/" className="text-blue-600 hover:text-blue-800 underline">
+                    Volver al inicio
+                </a>
+            </div>
+        )
+    }
+
+    if (center?.error) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+                <h2 className="text-2xl font-semibold text-gray-800">Error inesperado</h2>
+                <p className="text-gray-500">Hubo un problema al cargar el centro deportivo</p>
+                <a href="/" className="text-blue-600 hover:text-blue-800 underline">
+                    Volver al inicio
+                </a>
             </div>
         )
     }
