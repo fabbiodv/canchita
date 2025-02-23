@@ -45,20 +45,11 @@ export const createCenter = async (center: Center) => {
 };
 
 export async function fetchAllCenters() {
-    // Durante el build, retornar array vacío
-    if (process.env.NEXT_PHASE === 'phase-production-build') {
-        return [];
-    }
-
-    if (!process.env.NEXT_PUBLIC_API_URL) {
-        console.warn('API URL no configurada');
-        return [];
-    }
 
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/centers`, {
             credentials: 'include',
-            next: { revalidate: 3600 },
+            cache: 'no-store',
             headers: {
                 'Content-Type': 'application/json',
             }

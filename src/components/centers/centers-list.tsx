@@ -1,9 +1,16 @@
+'use client'
+
+import { useEffect, useState } from "react"
 import { fetchAllCenters } from "@/utils/centers"
 import { CenterCard } from "./center-card"
 import { Center } from "@/types/center"
 
-export async function CentersList() {
-    const centers = await fetchAllCenters();
+export function CentersList() {
+    const [centers, setCenters] = useState<Center[]>([]);
+
+    useEffect(() => {
+        fetchAllCenters().then(setCenters);
+    }, []);
 
     if (!centers?.length) {
         return (
