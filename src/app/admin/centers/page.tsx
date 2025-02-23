@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { PlusIcon } from "lucide-react"
+import { LinkIcon, PlusIcon } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { CreateCenterDialog } from "@/components/admin/centers/create-center-dialog"
 import { fetchUserCenters } from "@/utils/centers"
+import { toast } from "sonner"
+
 interface SportCenter {
     id: string
     name: string
@@ -55,16 +57,36 @@ export default function CentersPage() {
                                     <TableHead>Dirección</TableHead>
                                     <TableHead>Estado</TableHead>
                                     <TableHead>Fecha de creación</TableHead>
+                                    <TableHead>Compartir link</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {centers.map((center) => (
-                                    <TableRow key={center.id}>
+                                    <TableRow
+                                        key={center.id}
+                                        className="cursor-pointer hover:bg-muted/50"
+                                        onClick={() => {
+                                            window.location.href = `/${center.id}`;
+                                        }}
+                                    >
                                         <TableCell>{center.name}</TableCell>
                                         <TableCell>{center.address}</TableCell>
                                         <TableCell>{center.isActive ? 'Activo' : 'Inactivo'}</TableCell>
                                         <TableCell>{new Date(center.createdAt).toLocaleDateString()}</TableCell>
-
+                                        <TableCell onClick={(e) => e.stopPropagation()}>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => {
+                                                    const url = `${window.location.origin}/${center.id}`;
+                                                    navigator.clipboard.writeText(url);
+                                                    toast.success('Link copiado al portapapeles');
+                                                }}
+                                                title="Copiar link del centro"
+                                            >
+                                                <LinkIcon className="h-4 w-4" />
+                                            </Button>
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
