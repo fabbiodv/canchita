@@ -15,7 +15,7 @@ export const ReservaCalendario = ({
 }: ReservaCalendarioProps) => {
     return (
         <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium">
                 Seleccionar Fecha
             </label>
             <Calendar

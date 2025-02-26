@@ -6,6 +6,7 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { createBooking } from "@/utils/bookings"
+import { ConfirmarReservaCliente } from "@/components/reserva/confirmar-reserva-cliente"
 
 interface ResumenReservaProps {
   address?: string
@@ -31,62 +32,69 @@ const ResumenReserva = ({
 
   const isDisabled = !cancha || !fecha || !hora || !fieldId
 
+  const handleConfirmReserva = async () => {
+    return createBooking(fieldId, fecha, hora, horaFin, precio)
+      .then(() => {
+        router.push('/profile/bookings')
+      })
+  }
+
   const handleReservar = async () => {
-    // Verificar si el usuario está autenticado
     if (!user) {
       toast.error('Debes iniciar sesión para realizar una reserva')
       router.push('/login')
       return
     }
-
-    try {
-      await createBooking(fieldId, fecha, hora, horaFin, precio)
-      toast.success('Reserva creada correctamente')
-      router.push('/profile/bookings')
-    } catch (error) {
-      console.error('Error al procesar la reserva:', error)
-      toast.error('Error al procesar la reserva')
-    }
   }
 
   return (
     <Card className='p-6 space-y-4 h-fit mt-8'>
-      <h2 className="text-xl font-semibold text-gray-800">
+      <h2 className="text-xl font-semibold">
         Resumen de Reserva
       </h2>
       <div className="space-y-2 text-sm">
         <p className="flex justify-between">
-          <span className="text-gray-600">Dirección:</span>
+          <span>Dirección:</span>
           <span className="font-medium">{address}</span>
         </p>
         <p className="flex justify-between">
-          <span className="text-gray-600">Cancha:</span>
+          <span>Cancha:</span>
           <span className="font-medium">{cancha}</span>
         </p>
         <p className="flex justify-between">
-          <span className="text-gray-600">Fecha:</span>
+          <span>Fecha:</span>
           <span className="font-medium">{fecha}</span>
         </p>
         <p className="flex justify-between">
-          <span className="text-gray-600">Hora:</span>
+          <span>Hora:</span>
           <span className="font-medium">{hora}</span>
         </p>
         {precio > 0 && (
           <p className="flex justify-between">
-            <span className="text-gray-600">Precio:</span>
+            <span>Precio:</span>
             <span className="font-medium">${precio}</span>
           </p>
         )}
       </div>
 
-      <Button
-        className="w-full bg-[#009ee3] hover:bg-[#008ed0] text-white"
-        size="lg"
-        onClick={handleReservar}
-        disabled={isDisabled}
-      >
-        {!user ? 'Inicia sesión para reservar' : 'Reservar'}
-      </Button>
+      <div className="space-y-4">
+        {!user ? (
+          <Button
+            className="w-full"
+            size="lg"
+            onClick={handleReservar}
+            disabled={isDisabled}
+          >
+            Inicia sesión para reservar
+          </Button>
+        ) : (
+          <ConfirmarReservaCliente
+            reservaId={fieldId}
+            onConfirm={handleConfirmReserva}
+            disabled={isDisabled}
+          />
+        )}
+      </div>
     </Card>
   )
 }
