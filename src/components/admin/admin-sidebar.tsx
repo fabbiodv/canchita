@@ -17,6 +17,7 @@ import {
     SheetHeader,
     SheetTitle,
 } from "@/components/ui/sheet"
+import React from "react"
 
 const sidebarItems = [
     {
@@ -87,10 +88,13 @@ function SidebarContent() {
 }
 
 export function AdminSidebar() {
+    const [open, setOpen] = React.useState(false)
+    const pathname = usePathname();
+
     return (
         <>
             {/* Versión móvil */}
-            <Sheet>
+            <Sheet open={open} onOpenChange={setOpen}>
                 <SheetTrigger asChild className="lg:hidden fixed left-4 top-4">
                     <Button variant="outline" size="icon">
                         <Menu className="h-4 w-4" />
@@ -100,7 +104,27 @@ export function AdminSidebar() {
                     <SheetHeader className="sr-only">
                         <SheetTitle>Panel de Administración</SheetTitle>
                     </SheetHeader>
-                    <SidebarContent />
+                    <div className="space-y-4">
+                        <div className="px-3 py-2">
+                            <h2 className="mb-2 px-4 text-lg font-semibold">Administrador</h2>
+                            <div className="space-y-1">
+                                {sidebarItems.map((item) => (
+                                    <Button
+                                        key={item.href}
+                                        variant={pathname === item.href ? "secondary" : "ghost"}
+                                        className={cn("w-full justify-start")}
+                                        asChild
+                                        onClick={() => setOpen(false)}
+                                    >
+                                        <Link href={item.href}>
+                                            <item.icon className="mr-2 h-4 w-4" />
+                                            {item.title}
+                                        </Link>
+                                    </Button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
                 </SheetContent>
             </Sheet>
 
