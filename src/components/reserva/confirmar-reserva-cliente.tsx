@@ -51,7 +51,7 @@ export function ConfirmarReservaCliente({ reservaId, onConfirm, disabled = false
                 disabled={disabled || isLoading}
                 className="w-full"
             >
-                Reservar
+                Reservar cancha
             </Button>
 
             <AlertDialog open={open} onOpenChange={setOpen}>

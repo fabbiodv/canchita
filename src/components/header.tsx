@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useAuth } from "@/hooks/useAuth"
 import { toast } from "sonner"
-import { Menu } from "lucide-react"
+import { Menu, LogOut } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { useState } from "react"
 import { ThemeToggle } from "@/components/layout/theme-toggle"
@@ -42,12 +42,17 @@ const Header = () => {
                             <span className="text-sm">{user.email}</span>
                         </Button>
                     </Link>
+                    <Link href="/admin">
+                        <Button variant="outline" className="w-full md:w-auto">
+                            <span className="text-sm">Admin</span>
+                        </Button>
+                    </Link>
                     <Button
                         variant="outline"
                         onClick={handleLogout}
                         className="w-full md:w-auto"
                     >
-                        Cerrar Sesión
+                        <LogOut className="h-4 w-4" />
                     </Button>
                 </>
             ) : (

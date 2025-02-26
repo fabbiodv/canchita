@@ -30,7 +30,7 @@ export function ConfirmarReserva({ reservaId, onConfirm, disabled = false }: Con
             setIsLoading(true)
             await onConfirm(reservaId)
             toast.success("Reserva confirmada", {
-                description: "La reserva ha sido confirmada exitosamente",
+                description: "Se ha enviado email al cliente",
             })
         } catch (error) {
             toast.error("Error", {
