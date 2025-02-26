@@ -92,27 +92,32 @@ export default function FieldsPage() {
                                 </Button>
                             </div>
                         ) : (
-                            <Table>
+                            <Table className="min-w-full">
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Nombre</TableHead>
-                                        <TableHead>Tipo</TableHead>
-                                        <TableHead>Superficie</TableHead>
+                                        <TableHead className="hidden md:table-cell">Tipo</TableHead>
+                                        <TableHead className="hidden md:table-cell">Superficie</TableHead>
                                         <TableHead>Precio</TableHead>
-                                        <TableHead>Estado</TableHead>
-                                        <TableHead>Centro deportivo</TableHead>
+                                        <TableHead className="hidden sm:table-cell">Estado</TableHead>
+                                        <TableHead className="hidden lg:table-cell">Centro deportivo</TableHead>
                                         <TableHead>Acciones</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {fields.length > 0 ? fields.map((field) => (
                                         <TableRow key={field.id}>
-                                            <TableCell>{field.name}</TableCell>
-                                            <TableCell>{typeMap[field.type as keyof typeof typeMap]}</TableCell>
-                                            <TableCell>{surfaceMap[field.surface as keyof typeof surfaceMap]}</TableCell>
+                                            <TableCell className="font-medium">
+                                                {field.name}
+                                                <div className="md:hidden text-xs text-muted-foreground mt-1">
+                                                    {typeMap[field.type as keyof typeof typeMap]}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="hidden md:table-cell">{typeMap[field.type as keyof typeof typeMap]}</TableCell>
+                                            <TableCell className="hidden md:table-cell">{surfaceMap[field.surface as keyof typeof surfaceMap]}</TableCell>
                                             <TableCell>${field.price}</TableCell>
-                                            <TableCell>{statusMap[field.status]}</TableCell>
-                                            <TableCell>{centers.find(c => c.id === field.centerId)?.name}</TableCell>
+                                            <TableCell className="hidden sm:table-cell">{statusMap[field.status]}</TableCell>
+                                            <TableCell className="hidden lg:table-cell">{centers.find(c => c.id === field.centerId)?.name}</TableCell>
                                             <TableCell>
                                                 <Button
                                                     variant="ghost"
@@ -121,8 +126,9 @@ export default function FieldsPage() {
                                                         setSelectedField(field)
                                                         setIsEditDialogOpen(true)
                                                     }}
+                                                    aria-label="Editar cancha"
                                                 >
-                                                    <PencilIcon className=" h-4 w-4" />
+                                                    <PencilIcon className="h-4 w-4" />
                                                 </Button>
                                             </TableCell>
                                         </TableRow>

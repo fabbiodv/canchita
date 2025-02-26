@@ -50,14 +50,14 @@ export default function CentersPage() {
 
                         </div>
                     ) : (
-                        <Table>
+                        <Table className="min-w-full">
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Nombre</TableHead>
-                                    <TableHead>Dirección</TableHead>
-                                    <TableHead>Estado</TableHead>
-                                    <TableHead>Fecha de creación</TableHead>
-                                    <TableHead>Compartir link</TableHead>
+                                    <TableHead className="hidden sm:table-cell">Dirección</TableHead>
+                                    <TableHead className="hidden md:table-cell">Estado</TableHead>
+                                    <TableHead className="hidden lg:table-cell">Fecha de creación</TableHead>
+                                    <TableHead>Acciones</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -69,10 +69,23 @@ export default function CentersPage() {
                                             window.location.href = `/${center.id}`;
                                         }}
                                     >
-                                        <TableCell>{center.name}</TableCell>
-                                        <TableCell>{center.address}</TableCell>
-                                        <TableCell>{center.isActive ? 'Activo' : 'Inactivo'}</TableCell>
-                                        <TableCell>{new Date(center.createdAt).toLocaleDateString()}</TableCell>
+                                        <TableCell className="font-medium">
+                                            {center.name}
+                                            <div className="sm:hidden text-xs text-muted-foreground mt-1">
+                                                {center.address}
+                                            </div>
+                                            <div className="md:hidden text-xs text-muted-foreground">
+                                                {center.isActive ? 'Activo' : 'Inactivo'}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="hidden sm:table-cell">{center.address}</TableCell>
+                                        <TableCell className="hidden md:table-cell">
+                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${center.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                                }`}>
+                                                {center.isActive ? 'Activo' : 'Inactivo'}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell className="hidden lg:table-cell">{new Date(center.createdAt).toLocaleDateString()}</TableCell>
                                         <TableCell onClick={(e) => e.stopPropagation()}>
                                             <Button
                                                 variant="ghost"
@@ -83,6 +96,7 @@ export default function CentersPage() {
                                                     toast.success('Link copiado al portapapeles');
                                                 }}
                                                 title="Copiar link del centro"
+                                                aria-label="Copiar link del centro"
                                             >
                                                 <LinkIcon className="h-4 w-4" />
                                             </Button>

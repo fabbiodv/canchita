@@ -72,46 +72,63 @@ export default function ReservationsPage() {
     }
 
     const ReservationsTable = ({ reservations = [] }: { reservations: Reservation[] }) => (
-        <Table>
+        <Table className="min-w-full">
             <TableHeader>
                 <TableRow>
-                    <TableHead>ID</TableHead>
+                    <TableHead className="hidden md:table-cell">ID</TableHead>
                     <TableHead>Cancha</TableHead>
-                    <TableHead>Centro deportivo</TableHead>
-                    <TableHead>Cliente</TableHead>
+                    <TableHead className="hidden lg:table-cell">Centro deportivo</TableHead>
+                    <TableHead className="hidden sm:table-cell">Cliente</TableHead>
                     <TableHead>Fecha</TableHead>
-                    <TableHead>Hora inicio</TableHead>
-                    <TableHead>Hora fin</TableHead>
+                    <TableHead className="hidden xs:table-cell">Hora</TableHead>
+                    <TableHead className="hidden md:table-cell">Hora fin</TableHead>
                     <TableHead>Estado</TableHead>
-                    <TableHead>Monto</TableHead>
-                    <TableHead>Confirmar Reserva</TableHead>
+                    <TableHead className="hidden sm:table-cell">Monto</TableHead>
+                    <TableHead>Acción</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
                 {isLoading ? (
                     <TableRow>
-                        <TableCell colSpan={9} className="text-center">
+                        <TableCell colSpan={10} className="text-center">
                             Cargando reservas...
                         </TableCell>
                     </TableRow>
                 ) : reservations.length === 0 ? (
                     <TableRow>
-                        <TableCell colSpan={9} className="text-center">
+                        <TableCell colSpan={10} className="text-center">
                             No hay reservas disponibles
                         </TableCell>
                     </TableRow>
                 ) : (
                     reservations.map((reservation) => (
                         <TableRow key={reservation.id}>
-                            <TableCell>{reservation.id}</TableCell>
-                            <TableCell>{reservation.fieldName}</TableCell>
-                            <TableCell>{reservation.centerName}</TableCell>
-                            <TableCell>{reservation.customerEmail}</TableCell>
-                            <TableCell>{formatDate(reservation.date)}</TableCell>
-                            <TableCell>{reservation.startTime}</TableCell>
-                            <TableCell>{reservation.endTime}</TableCell>
-                            <TableCell>{statusMap[reservation.status]}</TableCell>
-                            <TableCell>${reservation.totalAmount}</TableCell>
+                            <TableCell className="hidden md:table-cell">{reservation.id}</TableCell>
+                            <TableCell className="font-medium">
+                                {reservation.fieldName}
+                                <div className="sm:hidden text-xs text-muted-foreground mt-1">
+                                    {reservation.customerEmail}
+                                </div>
+                                <div className="xs:hidden text-xs text-muted-foreground">
+                                    {reservation.startTime}
+                                </div>
+                            </TableCell>
+                            <TableCell className="hidden lg:table-cell">{reservation.centerName}</TableCell>
+                            <TableCell className="hidden sm:table-cell">{reservation.customerEmail}</TableCell>
+                            <TableCell>
+                                {formatDate(reservation.date)}
+                            </TableCell>
+                            <TableCell className="hidden xs:table-cell">{reservation.startTime}</TableCell>
+                            <TableCell className="hidden md:table-cell">{reservation.endTime}</TableCell>
+                            <TableCell>
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${reservation.status === 'CONFIRMED' ? 'bg-green-100 text-green-800' :
+                                        reservation.status === 'CANCELLED' ? 'bg-red-100 text-red-800' :
+                                            'bg-yellow-100 text-yellow-800'
+                                    }`}>
+                                    {statusMap[reservation.status]}
+                                </span>
+                            </TableCell>
+                            <TableCell className="hidden sm:table-cell">${reservation.totalAmount}</TableCell>
                             <TableCell>
                                 <ConfirmarReserva
                                     reservaId={reservation.id}
