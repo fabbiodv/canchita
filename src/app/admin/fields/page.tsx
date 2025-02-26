@@ -43,6 +43,12 @@ export default function FieldsPage() {
         INACTIVE: 'Inactiva'
     }
 
+    const statusColorMap = {
+        ACTIVE: 'bg-green-100 text-green-800',
+        MAINTENANCE: 'bg-yellow-100 text-yellow-800',
+        INACTIVE: 'bg-red-100 text-red-800'
+    }
+
     const typeMap = {
         FUTBOL_5: 'Fútbol 5',
         FUTBOL_7: 'Fútbol 7',
@@ -116,7 +122,11 @@ export default function FieldsPage() {
                                             <TableCell className="hidden md:table-cell">{typeMap[field.type as keyof typeof typeMap]}</TableCell>
                                             <TableCell className="hidden md:table-cell">{surfaceMap[field.surface as keyof typeof surfaceMap]}</TableCell>
                                             <TableCell>${field.price}</TableCell>
-                                            <TableCell className="hidden sm:table-cell">{statusMap[field.status]}</TableCell>
+                                            <TableCell className="hidden sm:table-cell ">
+                                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColorMap[field.status as keyof typeof statusColorMap]}`}>
+                                                    {statusMap[field.status as keyof typeof statusMap]}
+                                                </span>
+                                            </TableCell>
                                             <TableCell className="hidden lg:table-cell">{centers.find(c => c.id === field.centerId)?.name}</TableCell>
                                             <TableCell>
                                                 <Button
