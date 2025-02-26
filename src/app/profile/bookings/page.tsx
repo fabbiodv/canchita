@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { fetchMyBookings } from "@/utils/bookings"
+import { formatDate } from "@/utils/dates"
 interface Booking {
     id: string
     fieldName: string
@@ -56,7 +57,7 @@ export default function BookingsPage() {
                                     <TableCell>{booking.id}</TableCell>
                                     <TableCell>{booking.fieldName}</TableCell>
                                     <TableCell>{booking.centerName}</TableCell>
-                                    <TableCell>{new Date(booking.date).toLocaleDateString()}</TableCell>
+                                    <TableCell>{formatDate(booking.date)}</TableCell>
                                     <TableCell>{`${booking.startTime} - ${booking.endTime}`}</TableCell>
                                     <TableCell>{statusMap[booking.status]}</TableCell>
                                     <TableCell>${booking.totalPrice}</TableCell>

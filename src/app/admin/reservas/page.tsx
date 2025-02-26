@@ -81,7 +81,6 @@ export default function ReservationsPage() {
                     <TableHead className="hidden sm:table-cell">Cliente</TableHead>
                     <TableHead>Fecha</TableHead>
                     <TableHead className="hidden xs:table-cell">Hora</TableHead>
-                    <TableHead className="hidden md:table-cell">Hora fin</TableHead>
                     <TableHead>Estado</TableHead>
                     <TableHead className="hidden sm:table-cell">Monto</TableHead>
                     <TableHead>Acción</TableHead>
@@ -110,7 +109,7 @@ export default function ReservationsPage() {
                                     {reservation.customerEmail}
                                 </div>
                                 <div className="xs:hidden text-xs text-muted-foreground">
-                                    {reservation.startTime}
+                                    {reservation.startTime} - {reservation.endTime}
                                 </div>
                             </TableCell>
                             <TableCell className="hidden lg:table-cell">{reservation.centerName}</TableCell>
@@ -119,11 +118,10 @@ export default function ReservationsPage() {
                                 {formatDate(reservation.date)}
                             </TableCell>
                             <TableCell className="hidden xs:table-cell">{reservation.startTime}</TableCell>
-                            <TableCell className="hidden md:table-cell">{reservation.endTime}</TableCell>
                             <TableCell>
                                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${reservation.status === 'CONFIRMED' ? 'bg-green-100 text-green-800' :
-                                        reservation.status === 'CANCELLED' ? 'bg-red-100 text-red-800' :
-                                            'bg-yellow-100 text-yellow-800'
+                                    reservation.status === 'CANCELLED' ? 'bg-red-100 text-red-800' :
+                                        'bg-yellow-100 text-yellow-800'
                                     }`}>
                                     {statusMap[reservation.status]}
                                 </span>
