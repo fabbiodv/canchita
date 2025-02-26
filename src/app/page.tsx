@@ -21,14 +21,14 @@ export default function Home() {
               className='bg-[#009ee3] hover:bg-[#008ed0] text-white px-6 md:px-8 py-4 md:py-6 text-base md:text-lg w-full sm:w-auto'
               asChild
             >
-              <Link href="/centers">Reservar Cancha</Link>
+              <Link href="/centers">⚽ Reservar Cancha para jugar</Link>
             </Button>
             <Button
               variant="outline"
               className='px-6 md:px-8 py-4 md:py-6 text-base md:text-lg w-full sm:w-auto'
               asChild
             >
-              <Link href="/admin/centers">Alquila tu cancha</Link>
+              <Link href="/admin/centers">🏟 Alquilá tu cancha</Link>
             </Button>
           </div>
         </section>

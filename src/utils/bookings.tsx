@@ -53,3 +53,22 @@ export const fetchBookings = async () => {
         throw error
     }
 }
+
+export const confirmBooking = async (bookingId: number) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookings/${bookingId}/confirm`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        })
+        if (!response.ok) {
+            throw new Error('Error al confirmar la reserva')
+        }
+        return await response.json()
+    } catch (error) {
+        console.error('Error al confirmar la reserva:', error)
+        throw error
+    }
+}

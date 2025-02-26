@@ -44,7 +44,7 @@ export function LoginForm() {
 
             const data = await response.json()
             console.log(data)
-            toast.success('Link de acceso enviado al email')
+            toast.success('Link de acceso enviado al email (No olvides revisar la carpeta de spam)')
         } catch (error) {
             console.error(error)
             toast.error('Error al enviar el magic link')

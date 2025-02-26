@@ -15,3 +15,15 @@ export const isDateDisabled = (date: Date) => {
     // Solo deshabilitar si es un día anterior
     return dateToCheckStart < todayStart;
 }
+
+// Función para formatear fechas ISO a formato DD/MM/YYYY
+export function formatDate(isoDate: string): string {
+    if (!isoDate) return '';
+
+    // Extraer solo la parte de la fecha (YYYY-MM-DD) para evitar problemas de zona horaria
+    const datePart = isoDate.split('T')[0];
+    const [year, month, day] = datePart.split('-');
+
+    // Retornar en formato DD/MM/YYYY
+    return `${day}/${month}/${year}`;
+}

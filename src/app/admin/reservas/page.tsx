@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { fetchBookings } from "@/utils/bookings"
+import { confirmBooking, fetchBookings } from "@/utils/bookings"
+import { formatDate } from "@/utils/dates"
+import { ConfirmarReserva } from "@/components/reserva/confirmar-reserva"
 
 interface Reservation {
     id: number
@@ -30,6 +31,7 @@ export default function ReservationsPage() {
             try {
                 setIsLoading(true)
                 const data = await fetchBookings()
+
                 setUpcomingReservations(data?.upcomingBookings ?? [])
                 setPastReservations(data?.pastBookings ?? [])
             } catch (error) {
@@ -50,6 +52,25 @@ export default function ReservationsPage() {
         CANCELLED: 'Cancelada'
     }
 
+    const handleConfirmReservation = async (reservationId: number) => {
+        try {
+            await confirmBooking(reservationId)
+
+            setUpcomingReservations(prevReservations =>
+                prevReservations.map(reservation =>
+                    reservation.id === reservationId
+                        ? { ...reservation, status: 'CONFIRMED' }
+                        : reservation
+                )
+            )
+
+            return Promise.resolve()
+        } catch (error) {
+            console.error('Error al confirmar la reserva:', error)
+            return Promise.reject(error)
+        }
+    }
+
     const ReservationsTable = ({ reservations = [] }: { reservations: Reservation[] }) => (
         <Table>
             <TableHeader>
@@ -63,7 +84,7 @@ export default function ReservationsPage() {
                     <TableHead>Hora fin</TableHead>
                     <TableHead>Estado</TableHead>
                     <TableHead>Monto</TableHead>
-                    <TableHead>Acciones</TableHead>
+                    <TableHead>Confirmar Reserva</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -86,15 +107,17 @@ export default function ReservationsPage() {
                             <TableCell>{reservation.fieldName}</TableCell>
                             <TableCell>{reservation.centerName}</TableCell>
                             <TableCell>{reservation.customerEmail}</TableCell>
-                            <TableCell>{new Date(reservation.date).toLocaleDateString()}</TableCell>
+                            <TableCell>{formatDate(reservation.date)}</TableCell>
                             <TableCell>{reservation.startTime}</TableCell>
                             <TableCell>{reservation.endTime}</TableCell>
                             <TableCell>{statusMap[reservation.status]}</TableCell>
                             <TableCell>${reservation.totalAmount}</TableCell>
                             <TableCell>
-                                <Button variant="ghost" size="sm">
-                                    Ver detalles
-                                </Button>
+                                <ConfirmarReserva
+                                    reservaId={reservation.id}
+                                    onConfirm={handleConfirmReservation}
+                                    disabled={reservation.status === 'CONFIRMED' || reservation.status === 'CANCELLED'}
+                                />
                             </TableCell>
                         </TableRow>
                     ))
