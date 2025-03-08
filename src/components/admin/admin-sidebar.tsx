@@ -6,7 +6,8 @@ import {
     LandPlot,
     MapPin,
     Menu,
-    Calendar
+    Calendar,
+    User
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -34,6 +35,11 @@ const sidebarItems = [
         title: "Reservas",
         href: "/admin/reservas",
         icon: Calendar,
+    },
+    {
+        title: "Perfiles",
+        href: "/admin/perfiles",
+        icon: User,
     },
     /*
     {

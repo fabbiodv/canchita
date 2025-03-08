@@ -57,7 +57,7 @@ export function ConfirmarReservaCliente({ reservaId, onConfirm, disabled = false
             <AlertDialog open={open} onOpenChange={setOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Confirmar reserva</AlertDialogTitle>
+                        <AlertDialogTitle>Enviar reserva</AlertDialogTitle>
                         <AlertDialogDescription>
                             ¿Estás seguro que deseas enviar la reserva #{reservaId}?
                             Esta acción no se puede deshacer.
@@ -72,7 +72,7 @@ export function ConfirmarReservaCliente({ reservaId, onConfirm, disabled = false
                             }}
                             disabled={isLoading}
                         >
-                            {isLoading ? "Confirmando..." : "Confirmar reserva"}
+                            {isLoading ? "Enviando..." : "Enviar reserva"}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
