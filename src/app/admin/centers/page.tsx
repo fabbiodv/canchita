@@ -17,6 +17,12 @@ interface SportCenter {
     createdAt: string
 }
 
+interface CenterAdmin {
+    id: string
+    email: string
+    name: string
+}
+
 export default function CentersPage() {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [centers, setCenters] = useState<SportCenter[]>([])
@@ -53,6 +59,7 @@ export default function CentersPage() {
                         <Table className="min-w-full">
                             <TableHeader>
                                 <TableRow>
+                                    <TableHead>Creado por</TableHead>
                                     <TableHead>Nombre</TableHead>
                                     <TableHead className="hidden sm:table-cell">Dirección</TableHead>
                                     <TableHead className="hidden md:table-cell">Estado</TableHead>
@@ -69,6 +76,9 @@ export default function CentersPage() {
                                             window.location.href = `/${center.id}`;
                                         }}
                                     >
+                                        <TableCell className="font-medium">
+                                            {center.owner?.email}
+                                        </TableCell>
                                         <TableCell className="font-medium">
                                             {center.name}
                                             <div className="sm:hidden text-xs text-muted-foreground mt-1">
