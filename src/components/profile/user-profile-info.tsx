@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "sonner"
 import { MailIcon, UserIcon, PhoneIcon, UserCircleIcon, CheckCircleIcon } from "lucide-react"
+import { EditProfileDialog } from "./edit-profile-dialog"
 
 interface UserData {
   id: number
@@ -26,29 +27,30 @@ export function UserProfileInfo() {
   const [userData, setUserData] = useState<UserData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/session`, {
-          credentials: 'include',
-        })
+  const fetchUserData = async () => {
+    setIsLoading(true)
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/session`, {
+        credentials: 'include',
+      })
 
-        if (!response.ok) {
-          throw new Error('No se pudo obtener la información del usuario')
-        }
-
-        const data = await response.json()
-        setUserData(data.user)
-      } catch (error) {
-        console.error(error)
-        toast.error('Error al cargar datos del perfil', {
-          description: 'No se pudo obtener la información de tu perfil'
-        })
-      } finally {
-        setIsLoading(false)
+      if (!response.ok) {
+        throw new Error('No se pudo obtener la información del usuario')
       }
-    }
 
+      const data = await response.json()
+      setUserData(data.user)
+    } catch (error) {
+      console.error(error)
+      toast.error('Error al cargar datos del perfil', {
+        description: 'No se pudo obtener la información de tu perfil'
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
     fetchUserData()
   }, [])
 
@@ -199,9 +201,12 @@ export function UserProfileInfo() {
           </div>
         </div>
 
-        <Button variant="outline" className="w-full mt-4">
-          Editar perfil
-        </Button>
+        {userData && (
+          <EditProfileDialog
+            userData={userData}
+            onProfileUpdate={fetchUserData}
+          />
+        )}
       </CardContent>
     </Card>
   )
