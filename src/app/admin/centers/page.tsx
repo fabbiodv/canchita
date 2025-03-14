@@ -15,13 +15,11 @@ interface SportCenter {
     address: string
     isActive: boolean
     createdAt: string
+    owner?: {
+        email: string
+    }
 }
 
-interface CenterAdmin {
-    id: string
-    email: string
-    name: string
-}
 
 export default function CentersPage() {
     const [isDialogOpen, setIsDialogOpen] = useState(false)

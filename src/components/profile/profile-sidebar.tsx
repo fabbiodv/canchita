@@ -4,7 +4,8 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
     Menu,
-    Calendar
+    Calendar,
+    User
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -17,6 +18,11 @@ import {
 } from "@/components/ui/sheet"
 
 const sidebarItems = [
+    {
+        title: 'Mi Perfil',
+        href: '/profile',
+        icon: User,
+    },
 
     {
         title: "Mis Reservas",

@@ -1,6 +1,5 @@
 import { Metadata } from "next"
 import { LoginForm } from "@/components/auth/login-form"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export const metadata: Metadata = {
     title: "Iniciar Sesión",
@@ -10,17 +9,7 @@ export const metadata: Metadata = {
 export default function LoginPage() {
     return (
         <main className="min-h-[calc(100vh-6rem)] grid place-items-center p-4">
-            <Card className="w-full max-w-[400px]">
-                <CardHeader className="text-center">
-                    <CardTitle>Bienvenido de nuevo</CardTitle>
-                    <CardDescription>
-                        Ingresa tu correo electrónico para recibir un enlace para iniciar sesión
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <LoginForm />
-                </CardContent>
-            </Card>
+            <LoginForm />
         </main>
     )
 }

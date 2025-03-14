@@ -64,7 +64,7 @@ const Header = () => {
                         <DropdownMenuItem asChild>
                             <Link href="/admin" className="flex w-full cursor-pointer">
                                 <LayoutDashboard className="h-4 w-4 mr-2" />
-                                Admin
+                                Administrador
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
