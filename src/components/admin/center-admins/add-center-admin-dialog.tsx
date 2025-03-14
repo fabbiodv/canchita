@@ -236,7 +236,10 @@ export function AddCenterAdminDialog({
                             >
                                 Cancelar
                             </Button>
-                            <Button type="submit" disabled={isLoading}>
+                            <Button
+                                type="submit"
+                                disabled={isLoading || form.watch("permissions").length === 0}
+                            >
                                 {isLoading ? "Agregando..." : "Agregar administrador"}
                             </Button>
                         </DialogFooter>

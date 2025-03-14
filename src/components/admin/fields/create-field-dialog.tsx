@@ -173,7 +173,7 @@ export function CreateFieldDialog({ open, onOpenChange, onCreateSuccess, centers
                                 <FormItem>
                                     <FormLabel>Nombre</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Cancha 1" {...field} />
+                                        <Input placeholder="Ingrese el nombre de la cancha" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

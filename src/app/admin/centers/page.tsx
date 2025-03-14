@@ -64,7 +64,7 @@ export default function CentersPage() {
                                     <TableHead className="hidden sm:table-cell">Dirección</TableHead>
                                     <TableHead className="hidden md:table-cell">Estado</TableHead>
                                     <TableHead className="hidden lg:table-cell">Fecha de creación</TableHead>
-                                    <TableHead>Acciones</TableHead>
+                                    <TableHead>Compartir Link</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
