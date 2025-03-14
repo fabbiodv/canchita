@@ -19,7 +19,7 @@ import {
 const sidebarItems = [
 
     {
-        title: "Mis reservas",
+        title: "Mis Reservas",
         href: "/profile/bookings",
         icon: Calendar,
     },
