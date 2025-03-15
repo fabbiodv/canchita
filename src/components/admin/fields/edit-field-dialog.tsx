@@ -127,10 +127,14 @@ export function EditFieldDialog({ open, onOpenChange, onEditSuccess, field, cent
 
         try {
             setIsPending(true)
-            const fieldUpdated = await updateField(field.id.toString(), data as Field)
-            onEditSuccess(fieldUpdated)
-            onOpenChange(false)
-            toast.success('Cancha actualizada correctamente')
+            const result = await updateField(field.id.toString(), data as Field)
+            if (!result.success) {
+                toast.error(result.error)
+            } else {
+                onEditSuccess(result.data)
+                onOpenChange(false)
+                toast.success('Cancha actualizada correctamente')
+            }
         } catch (error) {
             console.error('Error al actualizar cancha:', error)
             toast.error(error instanceof Error ? error.message : 'Error al actualizar la cancha')

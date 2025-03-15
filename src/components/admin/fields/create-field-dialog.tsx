@@ -235,11 +235,11 @@ export function CreateFieldDialog({ open, onOpenChange, onCreateSuccess, centers
                             name="price"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Precio por hora</FormLabel>
+                                    <FormLabel>Precio por hora (ARS)</FormLabel>
                                     <FormControl>
                                         <Input
                                             type="number"
-                                            placeholder="0.00"
+                                            placeholder="$"
                                             {...field}
                                         />
                                     </FormControl>
