@@ -25,7 +25,7 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-
+import { updateUserProfile } from "@/utils/users"
 // Schema de validación para el formulario
 const profileFormSchema = z.object({
     name: z.string().min(1, "El nombre es requerido"),
@@ -66,18 +66,11 @@ export function EditProfileDialog({ userData, onProfileUpdate }: EditProfileDial
     async function onSubmit(data: ProfileFormValues) {
         setIsSubmitting(true)
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/profile`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include",
-                body: JSON.stringify(data),
+            await updateUserProfile({
+                id: userData.id,
+                email: userData.email,
+                ...data
             })
-
-            if (!response.ok) {
-                throw new Error("Error al actualizar el perfil")
-            }
 
             toast.success("Perfil actualizado", {
                 description: "Tu información personal ha sido actualizada correctamente",
