@@ -19,18 +19,32 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useParams } from "next/navigation"
 import { formatFieldType, formatSurfaceType } from "@/utils/formatFields"
+import dayjs from "dayjs"
+import 'dayjs/locale/es'
+import { useAuth } from "@/hooks/useAuth"
+import { Center } from "@/types/center"
+import { createBooking } from "@/utils/bookings"
+dayjs.locale('es')
 
-export default function BookingCalendar() {
+
+export default function BookingCalendar({ center }: { center: Center }) {
   const router = useRouter()
   const { centerId } = useParams()
+  const [selectedCourtType, setSelectedCourtType] = useState<string | null>(null)
   const [selectedCourt, setSelectedCourt] = useState<string | null>(null)
   const [courtTypes, setCourtTypes] = useState<{ type: string, surface: string }[]>([])
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
   const [bookingStep, setBookingStep] = useState(1)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [timeSlots, setTimeSlots] = useState<{ time: string, status: string, price: string }[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [bookingStatus, setBookingStatus] = useState({ success: true, message: '' })
+  const [availableFields, setAvailableFields] = useState([])
 
   // Mock data for calendar
+  const { user } = useAuth()
   const currentDate = new Date()
   const currentMonth = currentDate.getMonth()
   const currentYear = currentDate.getFullYear()
@@ -40,24 +54,32 @@ export default function BookingCalendar() {
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate()
   const firstDayOfMonth = new Date(viewYear, viewMonth, 1).getDay()
 
-  // Mock data for time slots
-  const timeSlots = [
-    { time: "08:00", status: "available", price: "$50" },
-    { time: "09:00", status: "available", price: "$50" },
-    { time: "10:00", status: "available", price: "$50" },
-    { time: "11:00", status: "booked", price: "$50" },
-    { time: "12:00", status: "booked", price: "$50" },
-    { time: "13:00", status: "available", price: "$60" },
-    { time: "14:00", status: "available", price: "$60" },
-    { time: "15:00", status: "available", price: "$60" },
-    { time: "16:00", status: "available", price: "$70" },
-    { time: "17:00", status: "available", price: "$70" },
-    { time: "18:00", status: "available", price: "$80" },
-    { time: "19:00", status: "available", price: "$80" },
-    { time: "20:00", status: "booked", price: "$80" },
-    { time: "21:00", status: "available", price: "$70" },
-    { time: "22:00", status: "available", price: "$70" },
-  ]
+  // Función para obtener los horarios disponibles
+  const fetchAvailableTimeSlots = async (fieldId: string, date: string) => {
+    try {
+      setIsLoading(true)
+      // Formatear la fecha a DD/MM/YYYY para la API
+      const [year, month, day] = date.split('-')
+      const formattedDate = `${day}/${month}/${year}`
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookings/slots/${centerId}?fieldId=${fieldId}&date=${formattedDate}`, {
+        credentials: 'include'
+      })
+
+      if (!response.ok) {
+        throw new Error('Error al obtener horarios disponibles')
+      }
+
+      const data = await response.json()
+      setTimeSlots(data)
+    } catch (error) {
+      console.error('Error al obtener horarios:', error)
+      // En caso de error, mostrar slots vacíos o un mensaje de error
+      setTimeSlots([])
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const monthNames = [
     "Enero",
@@ -80,11 +102,47 @@ export default function BookingCalendar() {
     const fetchCourtTypes = async () => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/fields/types/${centerId}`)
       const data = await response.json()
-      console.log(data)
       setCourtTypes(data)
     }
     fetchCourtTypes()
   }, [centerId])
+
+  // Effect para cargar las canchas específicas cuando se selecciona un tipo
+  useEffect(() => {
+    const fetchFieldsByType = async () => {
+      if (selectedCourtType) {
+        try {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/fields/center/${centerId}?type=${selectedCourtType}`, {
+            credentials: 'include'
+          })
+
+          if (!response.ok) {
+            throw new Error('Error al obtener canchas disponibles')
+          }
+
+          const fields = await response.json()
+          setAvailableFields(fields)
+
+          // Seleccionar la primera cancha automáticamente si hay disponibles
+          if (fields.length > 0) {
+            setSelectedCourt(fields[0].id.toString())
+          }
+        } catch (error) {
+          console.error('Error al obtener canchas:', error)
+          setAvailableFields([])
+        }
+      }
+    }
+
+    fetchFieldsByType()
+  }, [selectedCourtType, centerId])
+
+  // Effect para cargar los horarios cuando se selecciona una cancha y una fecha
+  useEffect(() => {
+    if (selectedCourt && selectedDate) {
+      fetchAvailableTimeSlots(selectedCourt, selectedDate)
+    }
+  }, [selectedCourt, selectedDate])
 
   const handlePrevMonth = () => {
     if (viewMonth === 0) {
@@ -121,10 +179,53 @@ export default function BookingCalendar() {
     setDialogOpen(true)
   }
 
-  const handleBookingSubmit = () => {
-    // In a real app, this would submit the booking data to the server
-    setDialogOpen(false)
-    router.push("/booking-confirmation")
+  const handleBookingSubmit = async () => {
+    try {
+      if (!selectedCourt || !selectedDate || !selectedTime || !centerId) {
+        throw new Error('Faltan datos para crear la reserva')
+      }
+
+      // Obtenemos el precio del horario seleccionado (sin el símbolo $)
+      const selectedSlot = timeSlots.find(slot => slot.time === selectedTime)
+      const price = selectedSlot ? parseFloat(selectedSlot.price) : 0
+
+      // Calculamos la hora de finalización (1 hora después de la seleccionada)
+      const [hour, minutes] = selectedTime.split(':').map(Number)
+      const endTime = `${(hour + 1).toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+
+      // Convertimos la fecha al formato DD/MM/YYYY que espera la API
+      const [year, month, day] = selectedDate.split('-')
+      const formattedDate = `${day}/${month}/${year}`
+
+      // Mostramos el estado de carga
+      setIsSubmitting(true)
+
+      // Llamamos a la función createBooking con todos los parámetros necesarios
+      await createBooking(
+        parseInt(selectedCourt),
+        formattedDate,
+        selectedTime,
+        endTime,
+        price
+      )
+
+      // La reserva se ha creado con éxito
+      setBookingStatus({ success: true, message: 'Reserva creada con éxito. Pendiente de confirmación por el dueño.' })
+      setDialogOpen(false)
+
+      // Redirigimos al usuario a la página de confirmación
+      setTimeout(() => {
+        router.push("/profile/bookings")
+      }, 2000)
+    } catch (error) {
+      console.error('Error al crear la reserva:', error)
+      setBookingStatus({
+        success: false,
+        message: error instanceof Error ? error.message : 'Error al crear la reserva'
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const renderCalendarDays = () => {
@@ -169,42 +270,47 @@ export default function BookingCalendar() {
     return days
   }
 
-  const handleCourtSelect = (courtId: string) => {
-    setSelectedCourt(courtId)
-    setSelectedDate(null)
-    setSelectedTime(null)
-  }
-
-  const handleResetSelection = () => {
+  const handleCourtTypeSelect = (courtType: string) => {
+    setSelectedCourtType(courtType)
     setSelectedCourt(null)
     setSelectedDate(null)
     setSelectedTime(null)
+    setTimeSlots([])
+  }
+
+  const handleResetSelection = () => {
+    setSelectedCourtType(null)
+    setSelectedCourt(null)
+    setSelectedDate(null)
+    setSelectedTime(null)
+    setTimeSlots([])
   }
 
   return (
     <div className="space-y-6">
-      {!selectedCourt ? (
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">Selecciona un tipo de cancha</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {courtTypes.map((court) => (
-              <Card key={court.type} className="overflow-hidden cursor-pointer hover:border-primary" onClick={() => handleCourtSelect(court.type)}>
-
-                <CardContent className="p-4">
-                  <h3 className="font-semibold text-lg">{formatFieldType(court.type)}</h3>
-                  <p className="text-sm text-muted-foreground">Superficie: {formatSurfaceType(court.surface)}</p>
-                </CardContent>
-              </Card>
-            ))}
+      {!selectedCourtType ? (
+        <>
+          <div>
+            <h2 className="text-2xl font-semibold mb-4">Selecciona un tipo de cancha</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {courtTypes.map((court, index) => (
+                <Card key={index} className="overflow-hidden cursor-pointer hover:border-primary" onClick={() => handleCourtTypeSelect(court.type)}>
+                  <CardContent className="p-4">
+                    <h3 className="font-semibold text-lg">{formatFieldType(court.type)}</h3>
+                    <p className="text-sm text-muted-foreground">Superficie: {formatSurfaceType(court.surface)}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
-        </div>
-      ) : (
+        </>
+      ) : availableFields.length > 0 ? (
         <>
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold">
-              <span className="font-bold">{formatFieldType(courtTypes.find(c => c.type === selectedCourt)?.type ?? '')}</span>
+              <span className="font-bold">{formatFieldType(courtTypes.find(c => c.type === selectedCourtType)?.type ?? '')}</span>
               <span className="text-muted-foreground"> - </span>
-              <span className="font-bold">{formatSurfaceType(courtTypes.find(c => c.type === selectedCourt)?.surface ?? '')}</span>
+              <span className="font-bold">{formatSurfaceType(courtTypes.find(c => c.type === selectedCourtType)?.surface ?? '')}</span>
             </h2>
             <Button variant="outline" size="sm" onClick={handleResetSelection}>
               Cambiar tipo de cancha
@@ -216,10 +322,6 @@ export default function BookingCalendar() {
                 <Calendar className="mr-2 h-4 w-4" />
                 Calendario
               </TabsTrigger>
-              {/* <TabsTrigger value="list">
-                <Clock className="mr-2 h-4 w-4" />
-                Horarios
-              </TabsTrigger> */}
             </TabsList>
 
             <TabsContent value="calendar" className="space-y-4">
@@ -257,74 +359,39 @@ export default function BookingCalendar() {
                 <Card>
                   <CardContent className="pt-6">
                     <h3 className="font-medium mb-4">
-                      Horarios disponibles para{" "}
-                      {new Date(selectedDate).toLocaleDateString("es-ES", {
-                        weekday: "long",
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
+                      Horarios disponibles para el{" "}
+                      {dayjs(selectedDate).format('dddd DD [de] MMMM [de] YYYY')}
                     </h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-                      {timeSlots.map((slot) => (
-                        <button
-                          key={slot.time}
-                          disabled={slot.status === "booked"}
-                          onClick={() => handleTimeClick(slot.time)}
-                          className={`p-2 rounded-md border text-center ${slot.status === "available"
-                            ? "border-green-500 bg-green-50 hover:bg-green-100 dark:bg-green-950/20 dark:hover:bg-green-950/30"
-                            : "border-red-300 bg-red-50 text-muted-foreground opacity-60 cursor-not-allowed dark:bg-red-950/10"
-                            }`}
-                        >
-                          <div className="font-medium">{slot.time}</div>
-                          <div className="text-xs">{slot.price}</div>
-                        </button>
-                      ))}
-                    </div>
+                    {isLoading ? (
+                      <div className="py-8 text-center">Cargando horarios disponibles...</div>
+                    ) : timeSlots.length === 0 ? (
+                      <div className="py-8 text-center">No hay horarios disponibles para esta fecha.</div>
+                    ) : (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+                        {timeSlots.map((slot) => (
+                          <button
+                            key={slot.time}
+                            disabled={slot.status === "pending" || slot.status === "confirmed"}
+                            onClick={() => handleTimeClick(slot.time)}
+                            className={`p-2 rounded-md border text-center ${slot.status === "pending" || slot.status === "confirmed"
+                              ? "border-red-300 bg-red-50 text-muted-foreground opacity-60 cursor-not-allowed dark:bg-red-950/10"
+                              : "border-green-500 bg-green-50 hover:bg-green-100 dark:bg-green-950/20 dark:hover:bg-green-950/30"
+                              }`}
+                          >
+                            <div className="font-medium">{slot.time}</div>
+                            <div className="text-xs">${slot.price}</div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               )}
             </TabsContent>
-
-            {/* <TabsContent value="list">
-              <Card>
-                <CardContent className="pt-6 space-y-4">
-                  {[0, 1, 2, 3, 4].map((dayOffset) => {
-                    const date = new Date()
-                    date.setDate(date.getDate() + dayOffset)
-                    const dateStr = date.toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })
-
-                    return (
-                      <div key={dayOffset} className="space-y-2">
-                        <h3 className="font-medium">{dateStr}</h3>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-                          {timeSlots.slice(0, 8).map((slot) => (
-                            <button
-                              key={`${dayOffset}-${slot.time}`}
-                              disabled={Math.random() > 0.7}
-                              onClick={() => {
-                                setSelectedDate(date.toISOString().split("T")[0])
-                                handleTimeClick(slot.time)
-                              }}
-                              className={`p-2 rounded-md border text-center ${Math.random() > 0.7
-                                ? "border-red-300 bg-red-50 text-muted-foreground opacity-60 cursor-not-allowed dark:bg-red-950/10"
-                                : "border-green-500 bg-green-50 hover:bg-green-100 dark:bg-green-950/20 dark:hover:bg-green-950/30"
-                                }`}
-                            >
-                              <div className="font-medium">{slot.time}</div>
-                              <div className="text-xs">{slot.price}</div>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </CardContent>
-              </Card>
-            </TabsContent> */}
-
           </Tabs>
         </>
+      ) : (
+        <div className="py-8 text-center">No hay canchas disponibles para el tipo seleccionado.</div>
       )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -333,101 +400,103 @@ export default function BookingCalendar() {
             <DialogTitle>Reservar Cancha</DialogTitle>
             <DialogDescription>
               {selectedCourt && selectedDate && selectedTime && (
-                <>
-                  {courtTypes.find(c => c.type === selectedCourt)?.type} -
-                  Fecha: {new Date(selectedDate).toLocaleDateString("es-ES")} a las {selectedTime}
-                </>
+
+                <div className="text-sm text-muted-foreground">
+                  <span className="font-bold">{formatFieldType(courtTypes.find(c => c.type === selectedCourtType)?.type ?? '')}</span> -
+                  <span className="text-muted-foreground"> {formatSurfaceType(courtTypes.find(c => c.type === selectedCourtType)?.surface ?? '')}</span>
+                  <span className="text-muted-foreground"> Fecha: {dayjs(selectedDate).format('DD MMMM YYYY')} a las {selectedTime}</span>
+                </div>
+
               )}
             </DialogDescription>
           </DialogHeader>
 
+          {bookingStatus.message && (
+            <div className={`p-3 rounded-md mb-4 ${bookingStatus.success ? 'bg-green-50 text-green-800 dark:bg-green-950/30 dark:text-green-300' : 'bg-red-50 text-red-800 dark:bg-red-950/30 dark:text-red-300'}`}>
+              {bookingStatus.message}
+            </div>
+          )}
+
           {bookingStep === 1 && (
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Nombre completo</Label>
-                <Input id="name" placeholder="Ingresa tu nombre" />
+                <Label htmlFor="name">Nombre</Label>
+                {user?.name ? (
+                  <Input id="name" placeholder={user?.name} disabled />
+                ) : (
+                  <Input id="name" placeholder="Ingresa tu nombre" />
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastname">Apellido</Label>
+                {user?.lastName ? (
+                  <Input id="lastname" placeholder={user?.lastName} disabled />
+                ) : (
+                  <Input id="lastname" placeholder="Ingresa tu apellido" />
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="dni">DNI</Label>
+                {user?.dni ? (
+                  <Input id="dni" placeholder={user?.dni} disabled />
+                ) : (
+                  <Input id="dni" placeholder="Ingresa tu DNI" />
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Teléfono</Label>
-                <Input id="phone" placeholder="+54 9 11 1234-5678" />
+                <Input id="phone" placeholder="11 1234-5678" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="tu@email.com" />
+                <Input placeholder={user?.email} disabled />
               </div>
               <div className="space-y-2">
                 <Label>Método de pago</Label>
-                <RadioGroup defaultValue="card">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="card" id="card" />
-                    <Label htmlFor="card">Tarjeta de crédito/débito</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="transfer" id="transfer" />
-                    <Label htmlFor="transfer">Transferencia bancaria</Label>
-                  </div>
+                <RadioGroup defaultValue="cash">
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="cash" id="cash" />
                     <Label htmlFor="cash">Efectivo en el lugar</Label>
                   </div>
                 </RadioGroup>
               </div>
-              <div className="space-y-2">
-                <Label>Equipamiento adicional</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  <label className="flex items-center gap-2 text-sm">
-                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300" />
-                    Pelotas (+$5)
-                  </label>
-                  <label className="flex items-center gap-2 text-sm">
-                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300" />
-                    Petos (+$10)
-                  </label>
-                  <label className="flex items-center gap-2 text-sm">
-                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300" />
-                    Agua (+$3)
-                  </label>
-                  <label className="flex items-center gap-2 text-sm">
-                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300" />
-                    Árbitro (+$30)
-                  </label>
-                </div>
-              </div>
             </div>
           )}
 
           {bookingStep === 2 && (
-            <div className="space-y-4 py-4">
-              <div className="rounded-lg border p-4 space-y-2">
-                <h4 className="font-medium">Resumen de la reserva</h4>
-                <div className="grid grid-cols-2 gap-1 text-sm">
-                  <div className="text-muted-foreground">Cancha:</div>
-                  <div>{courtTypes.find(c => c.type === selectedCourt)?.type} - {courtTypes.find(c => c.type === selectedCourt)?.surface}</div>
-                  <div className="text-muted-foreground">Fecha:</div>
-                  <div>{selectedDate && new Date(selectedDate).toLocaleDateString("es-ES")}</div>
-                  <div className="text-muted-foreground">Hora:</div>
-                  <div>{selectedTime}</div>
-                  <div className="text-muted-foreground">Duración:</div>
-                  <div>1 hora</div>
-                  <div className="text-muted-foreground">Ubicación:</div>
-                  <div>Sede Centro</div>
-                  <div className="text-muted-foreground">Equipamiento:</div>
-                  <div>Pelotas, Petos</div>
-                </div>
-                <div className="mt-4 pt-4 border-t">
-                  <div className="flex justify-between font-medium">
-                    <span>Total:</span>
-                    <span>$65.00</span>
+            <>
+              <div className="space-y-4 py-4">
+                <div className="rounded-lg border p-4 space-y-2">
+                  <h4 className="font-medium">Resumen de la reserva</h4>
+                  <div className="grid grid-cols-2 gap-1 text-sm">
+                    <div className="text-muted-foreground">Cancha:</div>
+                    <div>{formatFieldType(courtTypes.find(c => c.type === selectedCourtType)?.type ?? '')} - {formatSurfaceType(courtTypes.find(c => c.type === selectedCourtType)?.surface ?? '')}</div>
+                    <div className="text-muted-foreground">Fecha:</div>
+                    <div>{dayjs(selectedDate).format('dddd DD [de] MMMM [de] YYYY')}</div>
+                    <div className="text-muted-foreground">Hora:</div>
+                    <div>{selectedTime}</div>
+                    <div className="text-muted-foreground">Duración:</div>
+                    <div>1 hora</div>
+                    <div className="text-muted-foreground">Centro:</div>
+                    <div>{center?.name}</div>
+                    <div className="text-muted-foreground">Dirección:</div>
+                    <div>{center?.address}</div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t">
+                    <div className="flex justify-between font-medium">
+                      <span>Total:</span>
+                      <span>${timeSlots.find(slot => slot.time === selectedTime)?.price}</span>
+                    </div>
                   </div>
                 </div>
+                <div className="rounded-lg border p-4">
+                  <h4 className="font-medium mb-2">Información 🚧</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Una vez enviada la solicitud, tendras que esperar a que el dueño del centro confirme la reserva.
+                  </p>
+                </div>
               </div>
-              <div className="rounded-lg border p-4">
-                <h4 className="font-medium mb-2">Información de pago</h4>
-                <p className="text-sm text-muted-foreground">
-                  Se realizará un cargo de $65.00 a tu tarjeta terminada en 4242.
-                </p>
-              </div>
-            </div>
+            </>
           )}
 
           <DialogFooter>
@@ -435,10 +504,12 @@ export default function BookingCalendar() {
               <Button onClick={() => setBookingStep(2)}>Continuar</Button>
             ) : (
               <div className="flex w-full flex-col gap-2 sm:flex-row sm:justify-between">
-                <Button variant="outline" onClick={() => setBookingStep(1)}>
+                <Button variant="outline" onClick={() => setBookingStep(1)} disabled={isSubmitting}>
                   Volver
                 </Button>
-                <Button onClick={handleBookingSubmit}>Confirmar Reserva</Button>
+                <Button onClick={handleBookingSubmit} disabled={isSubmitting}>
+                  {isSubmitting ? 'Procesando...' : 'Confirmar Reserva'}
+                </Button>
               </div>
             )}
           </DialogFooter>

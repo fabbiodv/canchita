@@ -6,6 +6,7 @@ interface User {
     name?: string
     lastName?: string
     mpAccessToken?: string
+    dni?: string
 }
 
 export function useAuth() {

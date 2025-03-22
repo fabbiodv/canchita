@@ -4,35 +4,9 @@ import { use } from "react"
 import { useEffect, useState } from "react"
 import Link from 'next/link'
 import BookingCalendar from '@/components/reserva/booking-calendar'
-interface Center {
-    id: number
-    name: string
-    address: string
-    isAvailableForBooking: boolean
-    contactInfo?: {
-        message: string
-        phone?: string
-        email?: string
-    }
-    notFound?: boolean
-    error?: boolean
-}
+import { Center } from "@/types/center"
 
-interface Field {
-    id: number
-    name: string
-    type: string
-    surface: string
-    price: number
-    centerName: string
-    availability?: TimeSlot[]
-}
 
-interface TimeSlot {
-    startTime: string
-    endTime: string
-    isAvailable: boolean
-}
 
 interface PageProps {
     params: Promise<{ centerId: string }>
@@ -40,15 +14,7 @@ interface PageProps {
 
 export default function ReservePage({ params }: PageProps) {
     const { centerId } = use(params)
-    const [fields, setFields] = useState<Field[]>([])
     const [center, setCenter] = useState<Center>()
-    const [selectedField, setSelectedField] = useState<string>("")
-    const [selectedDate, setSelectedDate] = useState<Date>()
-    const [selectedTime, setSelectedTime] = useState<string>("")
-    const [selectedEndTime, setSelectedEndTime] = useState<string>("")
-    const [availableTimeSlots, setAvailableTimeSlots] = useState<TimeSlot[]>([])
-
-
 
     // Cargar detalles del centro
     useEffect(() => {
@@ -63,8 +29,6 @@ export default function ReservePage({ params }: PageProps) {
                         id: 0,
                         name: '',
                         address: '',
-                        isAvailableForBooking: false,
-                        notFound: true
                     })
                     return
                 }
@@ -81,8 +45,6 @@ export default function ReservePage({ params }: PageProps) {
                     id: 0,
                     name: '',
                     address: '',
-                    isAvailableForBooking: false,
-                    error: true
                 })
             }
         }
@@ -90,7 +52,7 @@ export default function ReservePage({ params }: PageProps) {
         fetchCenterDetails()
     }, [centerId])
 
-    if (center?.notFound) {
+    if (center?.id === 0) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center gap-4">
                 <h2 className="text-2xl font-semibold text-gray-800">Centro deportivo no encontrado</h2>
@@ -102,7 +64,7 @@ export default function ReservePage({ params }: PageProps) {
         )
     }
 
-    if (center?.error) {
+    if (center?.id === 0) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center gap-4">
                 <h2 className="text-2xl font-semibold text-gray-800">Error inesperado</h2>
@@ -119,7 +81,7 @@ export default function ReservePage({ params }: PageProps) {
             <main className='container mx-auto px-4 max-w-4xl'>
 
                 <h1 className='text-2xl font-bold my-6 text-center'>{center?.name}</h1>
-                <BookingCalendar />
+                <BookingCalendar center={center as Center} />
             </main>
         </div >
     )
