@@ -137,3 +137,18 @@ export const formatBookingDateTime = (date: string | Date, time: string) => {
         .locale('es')
         .format('dddd DD [de] MMMM [de] YYYY') + ' a las ' + time
 }
+
+export const fetchAvailableTimeSlots = async (centerId: number, fieldId: number, date: string) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookings/slots/${centerId}?fieldId=${fieldId}&date=${date}`, {
+            credentials: 'include'
+        })
+        if (!response.ok) {
+            throw new Error('Error al obtener los horarios disponibles')
+        }
+        return await response.json()
+    } catch (error) {
+        console.error('Error al obtener los horarios disponibles:', error)
+        throw error
+    }
+}

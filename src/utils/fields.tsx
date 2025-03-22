@@ -61,3 +61,16 @@ export const updateField = async (id: string, data: Field) => {
     }
 }
 
+export const fetchFieldsByCenterId = async (centerId: string) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/fields/center/${centerId}`, {
+            credentials: 'include'
+        })
+
+        return response.json()
+    } catch (error) {
+        console.error('Error al obtener canchas por centerId:', error)
+        throw error
+    }
+}
+

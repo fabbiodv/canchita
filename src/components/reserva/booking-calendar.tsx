@@ -23,16 +23,18 @@ import dayjs from "dayjs"
 import 'dayjs/locale/es'
 import { useAuth } from "@/hooks/useAuth"
 import { Center } from "@/types/center"
-import { createBooking } from "@/utils/bookings"
+import { createBooking, fetchAvailableTimeSlots } from "@/utils/bookings"
+import { fetchFieldsByCenterId } from "@/utils/fields"
+import { Field } from "@/types/field"
+import { formatDateForApi } from "@/utils/formatDate"
 dayjs.locale('es')
 
 
 export default function BookingCalendar({ center }: { center: Center }) {
   const router = useRouter()
   const { centerId } = useParams()
-  const [selectedCourtType, setSelectedCourtType] = useState<string | null>(null)
-  const [selectedCourt, setSelectedCourt] = useState<string | null>(null)
-  const [courtTypes, setCourtTypes] = useState<{ type: string, surface: string }[]>([])
+  const [selectedField, setSelectedField] = useState<Field | null>(null)
+  const [fields, setFields] = useState<Field[]>([])
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
   const [bookingStep, setBookingStep] = useState(1)
@@ -41,7 +43,6 @@ export default function BookingCalendar({ center }: { center: Center }) {
   const [isLoading, setIsLoading] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [bookingStatus, setBookingStatus] = useState({ success: true, message: '' })
-  const [availableFields, setAvailableFields] = useState([])
 
   // Mock data for calendar
   const { user } = useAuth()
@@ -55,23 +56,15 @@ export default function BookingCalendar({ center }: { center: Center }) {
   const firstDayOfMonth = new Date(viewYear, viewMonth, 1).getDay()
 
   // Función para obtener los horarios disponibles
-  const fetchAvailableTimeSlots = async (fieldId: string, date: string) => {
+  const loadTimeSlots = async (fieldId: string, date: string) => {
     try {
       setIsLoading(true)
       // Formatear la fecha a DD/MM/YYYY para la API
-      const [year, month, day] = date.split('-')
-      const formattedDate = `${day}/${month}/${year}`
+      const formattedDate = formatDateForApi(date)
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookings/slots/${centerId}?fieldId=${fieldId}&date=${formattedDate}`, {
-        credentials: 'include'
-      })
+      const response = await fetchAvailableTimeSlots(parseInt(centerId as string), parseInt(fieldId), formattedDate)
 
-      if (!response.ok) {
-        throw new Error('Error al obtener horarios disponibles')
-      }
-
-      const data = await response.json()
-      setTimeSlots(data)
+      setTimeSlots(response)
     } catch (error) {
       console.error('Error al obtener horarios:', error)
       // En caso de error, mostrar slots vacíos o un mensaje de error
@@ -99,50 +92,19 @@ export default function BookingCalendar({ center }: { center: Center }) {
   const dayNames = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
 
   useEffect(() => {
-    const fetchCourtTypes = async () => {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/fields/types/${centerId}`)
-      const data = await response.json()
-      setCourtTypes(data)
+    const loadFields = async () => {
+      const response = await fetchFieldsByCenterId(centerId as string)
+      setFields(response)
     }
-    fetchCourtTypes()
+    loadFields()
   }, [centerId])
-
-  // Effect para cargar las canchas específicas cuando se selecciona un tipo
-  useEffect(() => {
-    const fetchFieldsByType = async () => {
-      if (selectedCourtType) {
-        try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/fields/center/${centerId}?type=${selectedCourtType}`, {
-            credentials: 'include'
-          })
-
-          if (!response.ok) {
-            throw new Error('Error al obtener canchas disponibles')
-          }
-
-          const fields = await response.json()
-          setAvailableFields(fields)
-
-          // Seleccionar la primera cancha automáticamente si hay disponibles
-          if (fields.length > 0) {
-            setSelectedCourt(fields[0].id.toString())
-          }
-        } catch (error) {
-          console.error('Error al obtener canchas:', error)
-          setAvailableFields([])
-        }
-      }
-    }
-
-    fetchFieldsByType()
-  }, [selectedCourtType, centerId])
 
   // Effect para cargar los horarios cuando se selecciona una cancha y una fecha
   useEffect(() => {
-    if (selectedCourt && selectedDate) {
-      fetchAvailableTimeSlots(selectedCourt, selectedDate)
+    if (selectedField && selectedDate) {
+      loadTimeSlots(selectedField.id.toString(), selectedDate)
     }
-  }, [selectedCourt, selectedDate])
+  }, [selectedField, selectedDate])
 
   const handlePrevMonth = () => {
     if (viewMonth === 0) {
@@ -181,7 +143,7 @@ export default function BookingCalendar({ center }: { center: Center }) {
 
   const handleBookingSubmit = async () => {
     try {
-      if (!selectedCourt || !selectedDate || !selectedTime || !centerId) {
+      if (!selectedField || !selectedDate || !selectedTime || !centerId) {
         throw new Error('Faltan datos para crear la reserva')
       }
 
@@ -202,7 +164,7 @@ export default function BookingCalendar({ center }: { center: Center }) {
 
       // Llamamos a la función createBooking con todos los parámetros necesarios
       await createBooking(
-        parseInt(selectedCourt),
+        parseInt(selectedField.id.toString()),
         formattedDate,
         selectedTime,
         endTime,
@@ -270,17 +232,15 @@ export default function BookingCalendar({ center }: { center: Center }) {
     return days
   }
 
-  const handleCourtTypeSelect = (courtType: string) => {
-    setSelectedCourtType(courtType)
-    setSelectedCourt(null)
+  const handleFieldSelect = (field: Field) => {
+    setSelectedField(field)
     setSelectedDate(null)
     setSelectedTime(null)
     setTimeSlots([])
   }
 
   const handleResetSelection = () => {
-    setSelectedCourtType(null)
-    setSelectedCourt(null)
+    setSelectedField(null)
     setSelectedDate(null)
     setSelectedTime(null)
     setTimeSlots([])
@@ -288,32 +248,32 @@ export default function BookingCalendar({ center }: { center: Center }) {
 
   return (
     <div className="space-y-6">
-      {!selectedCourtType ? (
+      {!selectedField ? (
         <>
           <div>
-            <h2 className="text-2xl font-semibold mb-4">Selecciona un tipo de cancha</h2>
+            <h2 className="text-2xl font-semibold mb-4">Selecciona una cancha</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {courtTypes.map((court, index) => (
-                <Card key={index} className="overflow-hidden cursor-pointer hover:border-primary" onClick={() => handleCourtTypeSelect(court.type)}>
+              {fields.map((field) => (
+                <Card key={field.id} className="overflow-hidden cursor-pointer hover:border-primary" onClick={() => handleFieldSelect(field)}>
                   <CardContent className="p-4">
-                    <h3 className="font-semibold text-lg">{formatFieldType(court.type)}</h3>
-                    <p className="text-sm text-muted-foreground">Superficie: {formatSurfaceType(court.surface)}</p>
+                    <h3 className="font-semibold text-lg">{formatFieldType(field.type)}</h3>
+                    <p className="text-sm text-muted-foreground">Superficie: {formatSurfaceType(field.surface)}</p>
                   </CardContent>
                 </Card>
               ))}
             </div>
           </div>
         </>
-      ) : availableFields.length > 0 ? (
+      ) : (
         <>
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold">
-              <span className="font-bold">{formatFieldType(courtTypes.find(c => c.type === selectedCourtType)?.type ?? '')}</span>
+              <span className="font-bold">{formatFieldType(selectedField.type)}</span>
               <span className="text-muted-foreground"> - </span>
-              <span className="font-bold">{formatSurfaceType(courtTypes.find(c => c.type === selectedCourtType)?.surface ?? '')}</span>
+              <span className="font-bold">{formatSurfaceType(selectedField.surface)}</span>
             </h2>
             <Button variant="outline" size="sm" onClick={handleResetSelection}>
-              Cambiar tipo de cancha
+              Cambiar cancha
             </Button>
           </div>
           <Tabs defaultValue="calendar">
@@ -371,9 +331,9 @@ export default function BookingCalendar({ center }: { center: Center }) {
                         {timeSlots.map((slot) => (
                           <button
                             key={slot.time}
-                            disabled={slot.status === "pending" || slot.status === "confirmed"}
+                            disabled={slot.status === "pending" || slot.status === "confirmed" || slot.status === "unavailable"}
                             onClick={() => handleTimeClick(slot.time)}
-                            className={`p-2 rounded-md border text-center ${slot.status === "pending" || slot.status === "confirmed"
+                            className={`p-2 rounded-md border text-center ${slot.status === "pending" || slot.status === "confirmed" || slot.status === "unavailable"
                               ? "border-red-300 bg-red-50 text-muted-foreground opacity-60 cursor-not-allowed dark:bg-red-950/10"
                               : "border-green-500 bg-green-50 hover:bg-green-100 dark:bg-green-950/20 dark:hover:bg-green-950/30"
                               }`}
@@ -390,8 +350,6 @@ export default function BookingCalendar({ center }: { center: Center }) {
             </TabsContent>
           </Tabs>
         </>
-      ) : (
-        <div className="py-8 text-center">No hay canchas disponibles para el tipo seleccionado.</div>
       )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -399,14 +357,12 @@ export default function BookingCalendar({ center }: { center: Center }) {
           <DialogHeader>
             <DialogTitle>Reservar Cancha</DialogTitle>
             <DialogDescription>
-              {selectedCourt && selectedDate && selectedTime && (
-
-                <div className="text-sm text-muted-foreground">
-                  <span className="font-bold">{formatFieldType(courtTypes.find(c => c.type === selectedCourtType)?.type ?? '')}</span> -
-                  <span className="text-muted-foreground"> {formatSurfaceType(courtTypes.find(c => c.type === selectedCourtType)?.surface ?? '')}</span>
+              {selectedField && selectedDate && selectedTime && (
+                <span className="text-sm text-muted-foreground">
+                  <span className="font-bold">{formatFieldType(selectedField.type)}</span> -
+                  <span className="text-muted-foreground"> {formatSurfaceType(selectedField.surface)}</span>
                   <span className="text-muted-foreground"> Fecha: {dayjs(selectedDate).format('DD MMMM YYYY')} a las {selectedTime}</span>
-                </div>
-
+                </span>
               )}
             </DialogDescription>
           </DialogHeader>
@@ -470,7 +426,7 @@ export default function BookingCalendar({ center }: { center: Center }) {
                   <h4 className="font-medium">Resumen de la reserva</h4>
                   <div className="grid grid-cols-2 gap-1 text-sm">
                     <div className="text-muted-foreground">Cancha:</div>
-                    <div>{formatFieldType(courtTypes.find(c => c.type === selectedCourtType)?.type ?? '')} - {formatSurfaceType(courtTypes.find(c => c.type === selectedCourtType)?.surface ?? '')}</div>
+                    <div>{formatFieldType(selectedField?.type ?? '')} - {formatSurfaceType(selectedField?.surface ?? '')}</div>
                     <div className="text-muted-foreground">Fecha:</div>
                     <div>{dayjs(selectedDate).format('dddd DD [de] MMMM [de] YYYY')}</div>
                     <div className="text-muted-foreground">Hora:</div>
