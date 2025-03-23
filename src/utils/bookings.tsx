@@ -1,7 +1,18 @@
 import dayjs from 'dayjs'
 import 'dayjs/locale/es'
 
-export const createBooking = async (fieldId: number, date: string, startTime: string, endTime: string, pricePerHour: number) => {
+export const createBooking = async (
+    fieldId: number,
+    date: string,
+    startTime: string,
+    endTime: string,
+    pricePerHour: number,
+    userData?: {
+        name?: string;
+        lastName?: string;
+        dni?: string;
+    }
+) => {
     try {
 
         // Convertir fecha y hora locales a UTC
@@ -40,7 +51,9 @@ export const createBooking = async (fieldId: number, date: string, startTime: st
                 dateUTC: startTimeUTC, // Enviamos la fecha y hora de inicio en UTC
                 startTime, // Mantenemos también el formato original para compatibilidad
                 endTime,   // Mantenemos también el formato original para compatibilidad
-                pricePerHour
+                pricePerHour,
+                // Incluimos los datos del usuario si se proporcionan
+                ...userData
             })
         })
 

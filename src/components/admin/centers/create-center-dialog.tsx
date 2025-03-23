@@ -51,7 +51,6 @@ export function CreateCenterDialog({ open, onOpenChange, onCreateSuccess }: Crea
     async function onSubmit(data: CenterFormData) {
         try {
             setIsLoading(true)
-            console.log(data)
             const newCenter = await createCenter(data as Center)
             onCreateSuccess(newCenter)
             form.reset()

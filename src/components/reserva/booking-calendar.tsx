@@ -23,6 +23,9 @@ import { useBookingFields } from "@/hooks/useBookingFields"
 import { useBookingTimeSlots } from "@/hooks/useBookingTimeSlots"
 import { formatFieldType, formatSurfaceType } from "@/utils/formatFields"
 
+// Importar el tipo BookingFormValues del componente BookingDialog
+import type { BookingFormValues } from "./booking-form-types"
+
 export default function BookingCalendar({ center }: { center: Center }) {
   const router = useRouter()
   const { centerId } = useParams()
@@ -52,7 +55,7 @@ export default function BookingCalendar({ center }: { center: Center }) {
     setDialogOpen(true)
   }
 
-  const handleBookingSubmit = async () => {
+  const handleBookingSubmit = async (formData: BookingFormValues) => {
     try {
       if (!selectedField || !selectedDate || !selectedTime || !centerId) {
         throw new Error('Faltan datos para crear la reserva')
@@ -69,6 +72,20 @@ export default function BookingCalendar({ center }: { center: Center }) {
       // Convertimos la fecha al formato esperado
       const formattedDate = formatDateForApi(selectedDate)
 
+      // Recogemos los datos del usuario del formulario o usamos los existentes
+      const userData = {
+        name: formData.name || user?.name || "",
+        lastName: formData.lastName || user?.lastName || "",
+        dni: formData.dni || user?.dni || "",
+        phone: formData.phone || "",
+        paymentMethod: formData.paymentMethod
+      }
+
+      // Verificamos que tengamos los datos mínimos necesarios
+      if (!userData.phone) {
+        throw new Error('El teléfono es requerido para la reserva')
+      }
+
       setIsSubmitting(true)
 
       await createBooking(
@@ -76,7 +93,8 @@ export default function BookingCalendar({ center }: { center: Center }) {
         formattedDate,
         selectedTime,
         endTime,
-        price
+        price,
+        userData
       )
 
       setBookingStatus({
