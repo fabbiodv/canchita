@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button"
 import {
     LandPlot,
     MapPin,
-    Menu,
     Calendar,
-    User
+    User,
+    LayoutDashboard
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -101,9 +101,9 @@ export function AdminSidebar() {
         <>
             {/* Versión móvil */}
             <Sheet open={open} onOpenChange={setOpen}>
-                <SheetTrigger asChild className="lg:hidden fixed left-4 top-4">
+                <SheetTrigger asChild className="lg:hidden fixed left-3 top-6">
                     <Button variant="outline" size="icon">
-                        <Menu className="h-4 w-4" />
+                        <LayoutDashboard className="h-4 w-4" />
                     </Button>
                 </SheetTrigger>
                 <SheetContent side="left" className="w-64 p-0">

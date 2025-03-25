@@ -3,7 +3,6 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
-    Menu,
     Calendar,
     User
 } from "lucide-react"
@@ -16,6 +15,7 @@ import {
     SheetHeader,
     SheetTitle,
 } from "@/components/ui/sheet"
+import { useState } from "react"
 
 const sidebarItems = [
     {
@@ -23,7 +23,6 @@ const sidebarItems = [
         href: '/profile',
         icon: User,
     },
-
     {
         title: "Mis Reservas",
         href: "/profile/bookings",
@@ -35,26 +34,24 @@ const sidebarItems = [
         href: "/admin",
         icon: LayoutDashboard,
     },
-{
-    title: "Pagos",
-    href: "/admin/pagos",
-    icon: CreditCard,
-},
-{
-    title: "Usuarios",
-    href: "/admin/usuarios",
-    icon: Users,
-},
-{
-    title: "Configuración",
-    href: "/admin/configuracion",
-    icon: Settings,
-},*/
-
-
+    {
+        title: "Pagos",
+        href: "/admin/pagos",
+        icon: CreditCard,
+    },
+    {
+        title: "Usuarios",
+        href: "/admin/usuarios",
+        icon: Users,
+    },
+    {
+        title: "Configuración",
+        href: "/admin/configuracion",
+        icon: Settings,
+    },*/
 ]
 
-function SidebarContent() {
+function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
     const pathname = usePathname()
 
     return (
@@ -67,6 +64,7 @@ function SidebarContent() {
                             key={item.href}
                             variant={pathname === item.href ? "secondary" : "ghost"}
                             className={cn("w-full justify-start")}
+                            onClick={onItemClick}
                             asChild
                         >
                             <Link href={item.href}>
@@ -82,20 +80,26 @@ function SidebarContent() {
 }
 
 export function ProfileSidebar() {
+    const [open, setOpen] = useState(false)
+
+    const handleClose = () => {
+        setOpen(false)
+    }
+
     return (
         <>
             {/* Versión móvil */}
-            <Sheet>
-                <SheetTrigger asChild className="lg:hidden fixed left-4 top-4">
+            <Sheet open={open} onOpenChange={setOpen}>
+                <SheetTrigger asChild className="lg:hidden fixed left-3 top-6">
                     <Button variant="outline" size="icon">
-                        <Menu className="h-4 w-4" />
+                        <User className="h-4 w-4" />
                     </Button>
                 </SheetTrigger>
                 <SheetContent side="left" className="w-64 p-0">
                     <SheetHeader className="sr-only">
                         <SheetTitle>Perfil</SheetTitle>
                     </SheetHeader>
-                    <SidebarContent />
+                    <SidebarContent onItemClick={handleClose} />
                 </SheetContent>
             </Sheet>
 
@@ -107,4 +111,4 @@ export function ProfileSidebar() {
             </aside>
         </>
     )
-}
+} 

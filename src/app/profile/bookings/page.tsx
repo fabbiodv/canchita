@@ -43,10 +43,11 @@ export default function BookingsPage() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>ID</TableHead>
-                                <TableHead>Cancha</TableHead>
+                                <TableHead className="hidden md:table-cell">Cancha</TableHead>
                                 <TableHead>Centro Deportivo</TableHead>
                                 <TableHead>Fecha</TableHead>
-                                <TableHead>Hora</TableHead>
+                                <TableHead className="hidden md:table-cell">Horario</TableHead>
+                                <TableHead className="md:hidden">Hora</TableHead>
                                 <TableHead>Estado</TableHead>
                                 <TableHead>Precio</TableHead>
                             </TableRow>
@@ -55,10 +56,11 @@ export default function BookingsPage() {
                             {bookings.map((booking) => (
                                 <TableRow key={booking.id}>
                                     <TableCell>{booking.id}</TableCell>
-                                    <TableCell>{booking.fieldName}</TableCell>
+                                    <TableCell className="hidden md:table-cell">{booking.fieldName}</TableCell>
                                     <TableCell>{booking.centerName}</TableCell>
                                     <TableCell>{formatDate(booking.date)}</TableCell>
-                                    <TableCell>{`${booking.startTime} - ${booking.endTime}`}</TableCell>
+                                    <TableCell className="hidden md:table-cell">{`${booking.startTime} - ${booking.endTime}`}</TableCell>
+                                    <TableCell className="md:hidden">{`${booking.startTime}`}</TableCell>
                                     <TableCell>{statusMap[booking.status]}</TableCell>
                                     <TableCell>${booking.totalPrice}</TableCell>
                                 </TableRow>
