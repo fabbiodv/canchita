@@ -45,38 +45,86 @@ const Header = () => {
             {isLoading ? (
                 <span className="text-sm text-gray-500">Cargando...</span>
             ) : user ? (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Avatar className="cursor-pointer">
-                            <AvatarImage src={""} alt={user.email} />
-                            <AvatarFallback>{user.email?.charAt(0).toUpperCase()}</AvatarFallback>
-                        </Avatar>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                            <Link href="/profile" className="flex w-full cursor-pointer">
-                                <User className="h-4 w-4 mr-2" />
-                                Mi Perfil
+                <>
+                    {/* Versión desktop: usando dropdown */}
+                    <div className="hidden md:block">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Avatar className="cursor-pointer">
+                                    <AvatarImage src={""} alt={user.email} />
+                                    <AvatarFallback>{user.email?.charAt(0).toUpperCase()}</AvatarFallback>
+                                </Avatar>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem asChild>
+                                    <Link href="/profile" className="flex w-full cursor-pointer">
+                                        <User className="h-4 w-4 mr-2" />
+                                        Mi Perfil
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                    <Link href="/admin" className="flex w-full cursor-pointer">
+                                        <LayoutDashboard className="h-4 w-4 mr-2" />
+                                        Administrador
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={handleLogout} className="text-red-500 cursor-pointer">
+                                    <LogOut className="h-4 w-4 mr-2" />
+                                    Cerrar Sesión
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+
+                    {/* Versión móvil: enlaces directos */}
+                    <div className="md:hidden w-full space-y-4 mt-4">
+                        <div className="flex items-center gap-3 px-2">
+                            <Avatar className="h-8 w-8">
+                                <AvatarImage src={""} alt={user.email} />
+                                <AvatarFallback>{user.email?.charAt(0).toUpperCase()}</AvatarFallback>
+                            </Avatar>
+                            <span className="text-sm font-medium truncate">{user.email}</span>
+                        </div>
+                        <div className="border-t pt-4 space-y-2">
+                            <Link
+                                href="/profile"
+                                className="flex items-center p-2 hover:bg-accent rounded-md"
+                                onClick={() => setIsOpen(false)}
+                            >
+                                <User className="h-4 w-4 mr-3" />
+                                <span>Mi Perfil</span>
                             </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Link href="/admin" className="flex w-full cursor-pointer">
-                                <LayoutDashboard className="h-4 w-4 mr-2" />
-                                Administrador
+                            <Link
+                                href="/admin"
+                                className="flex items-center p-2 hover:bg-accent rounded-md"
+                                onClick={() => setIsOpen(false)}
+                            >
+                                <LayoutDashboard className="h-4 w-4 mr-3" />
+                                <span>Administrador</span>
                             </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleLogout} className="text-red-500 cursor-pointer">
-                            <LogOut className="h-4 w-4 mr-2" />
-                            Cerrar Sesión
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                            <button
+                                onClick={() => {
+                                    setIsOpen(false);
+                                    handleLogout();
+                                }}
+                                className="flex items-center p-2 w-full text-left text-red-500 hover:bg-accent rounded-md"
+                            >
+                                <LogOut className="h-4 w-4 mr-3" />
+                                <span>Cerrar Sesión</span>
+                            </button>
+                        </div>
+                    </div>
+                </>
             ) : (
-                <Button variant="outline" asChild className="w-full md:w-auto">
-                    <Link href="/login">
+                <Button
+                    variant="outline"
+                    asChild
+                    className="w-full md:w-auto"
+                >
+                    <Link href="/login" onClick={() => setIsOpen(false)}>
                         Ingresar
                     </Link>
                 </Button>
