@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import Link from 'next/link'
 import BookingCalendar from '@/components/reserva/booking-calendar'
 import { Center } from "@/types/center"
+import { ProtectedRoute } from "@/utils/protected-route"
 
 
 
@@ -77,12 +78,13 @@ export default function ReservePage({ params }: PageProps) {
     }
 
     return (
-        <div className='min-h-screen'>
-            <main className='container mx-auto px-4 max-w-4xl'>
-
-                <h1 className='text-2xl font-bold my-6 text-center'>{center?.name}</h1>
-                <BookingCalendar center={center as Center} />
-            </main>
-        </div >
+        <ProtectedRoute>
+            <div className='min-h-screen'>
+                <main className='container mx-auto px-4 max-w-4xl'>
+                    <h1 className='text-2xl font-bold my-6 text-center'>{center?.name}</h1>
+                    <BookingCalendar center={center as Center} />
+                </main>
+            </div>
+        </ProtectedRoute>
     )
 }
