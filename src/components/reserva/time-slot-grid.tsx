@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import dayjs from "dayjs"
 import 'dayjs/locale/es'
 import { TimeSlot } from "@/types/booking"
-
+import { checkSlotStatus } from "@/utils/dates"
 interface TimeSlotGridProps {
     selectedDate: string
     timeSlots: TimeSlot[]
@@ -11,6 +11,7 @@ interface TimeSlotGridProps {
 }
 
 export function TimeSlotGrid({ selectedDate, timeSlots, isLoading, onTimeSelect }: TimeSlotGridProps) {
+
     return (
         <Card>
             <CardContent className="pt-6">
@@ -27,9 +28,9 @@ export function TimeSlotGrid({ selectedDate, timeSlots, isLoading, onTimeSelect 
                         {timeSlots.map((slot) => (
                             <button
                                 key={slot.time}
-                                disabled={slot.status === "pending" || slot.status === "confirmed" || slot.status === "unavailable"}
+                                disabled={checkSlotStatus(selectedDate, slot)}
                                 onClick={() => onTimeSelect(slot.time)}
-                                className={`p-2 rounded-md border text-center ${slot.status === "pending" || slot.status === "confirmed" || slot.status === "unavailable"
+                                className={`p-2 rounded-md border text-center ${checkSlotStatus(selectedDate, slot)
                                     ? "border-red-300 bg-red-50 text-muted-foreground opacity-60 cursor-not-allowed dark:bg-red-950/10"
                                     : "border-green-500 bg-green-50 hover:bg-green-100 dark:bg-green-950/20 dark:hover:bg-green-950/30"
                                     }`}
